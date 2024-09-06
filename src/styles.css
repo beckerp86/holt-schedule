@@ -1,4 +1,8 @@
 :root {
-    --HPS_Brown: #593803;
-    --HPS_Gold: #d79423;
-  }
+  --HPS_Brown: #593803;
+  --HPS_Gold: #d79423;
+}
+
+body {
+  margin: 0;
+}

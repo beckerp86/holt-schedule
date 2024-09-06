@@ -1,12 +1,13 @@
 <div class="flex-container">
-  <div class="current-date-time">
-    <span class="date">Thursday, September 5th 2024</span>
-    <span class="time">11:51 PM</span>
+  <div class="header">
+    <span class="date">{{ svc.currentDateDisplay$ | async }}</span>
+    <span class="time">{{ svc.currentTimeDisplay$ | async }}</span>
+    <span class="schedule-type">Standard</span>
   </div>
   <div class="track">
     <div class="activity">
       <span class="activity-name">A Lunch</span>
-      <span class="activity-duration"> (25:00)</span>
+      <span class="activity-duration">(25:00)</span>
     </div>
     <div class="activity">Fourth Hour (A Lunch)</div>
   </div>
