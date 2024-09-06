@@ -1,0 +1,267 @@
+import { Injectable } from '@angular/core';
+import { ScheduleTypeEnum } from '../models/ScheduleType';
+
+@Injectable({
+  providedIn: 'root',
+})
+export class ScheduleOverrideService {
+  constructor() {}
+
+  private readonly _noSchoolOverrides: ScheduleOverride[] = [
+    {
+      date: new Date(2024, 9, 14),
+      scheduleType: ScheduleTypeEnum.NoSchool,
+      reason: 'Fall Break',
+    },
+    {
+      date: new Date(2024, 9, 15),
+      scheduleType: ScheduleTypeEnum.NoSchool,
+      reason: 'Fall Break',
+    },
+    {
+      date: new Date(2024, 9, 16),
+      scheduleType: ScheduleTypeEnum.NoSchool,
+      reason: 'Fall Break',
+    },
+    {
+      date: new Date(2024, 9, 17),
+      scheduleType: ScheduleTypeEnum.NoSchool,
+      reason: 'Fall Break',
+    },
+    {
+      date: new Date(2024, 9, 18),
+      scheduleType: ScheduleTypeEnum.NoSchool,
+      reason: 'Fall Break',
+    },
+    {
+      date: new Date(2024, 10, 5),
+      scheduleType: ScheduleTypeEnum.NoSchool,
+      reason: 'Election Day',
+    },
+    {
+      date: new Date(2024, 10, 27),
+      scheduleType: ScheduleTypeEnum.NoSchool,
+      reason: 'Thanksgiving Break',
+    },
+    {
+      date: new Date(2024, 10, 28),
+      scheduleType: ScheduleTypeEnum.NoSchool,
+      reason: 'Thanksgiving Break',
+    },
+    {
+      date: new Date(2024, 10, 29),
+      scheduleType: ScheduleTypeEnum.NoSchool,
+      reason: 'Thanksgiving Break',
+    },
+    {
+      date: new Date(2024, 11, 23),
+      scheduleType: ScheduleTypeEnum.NoSchool,
+      reason: 'Winter Break',
+    },
+    {
+      date: new Date(2024, 11, 24),
+      scheduleType: ScheduleTypeEnum.NoSchool,
+      reason: 'Winter Break',
+    },
+    {
+      date: new Date(2024, 11, 25),
+      scheduleType: ScheduleTypeEnum.NoSchool,
+      reason: 'Winter Break',
+    },
+    {
+      date: new Date(2024, 11, 26),
+      scheduleType: ScheduleTypeEnum.NoSchool,
+      reason: 'Winter Break',
+    },
+    {
+      date: new Date(2024, 11, 27),
+      scheduleType: ScheduleTypeEnum.NoSchool,
+      reason: 'Winter Break',
+    },
+    {
+      date: new Date(2024, 11, 30),
+      scheduleType: ScheduleTypeEnum.NoSchool,
+      reason: 'Winter Break',
+    },
+    {
+      date: new Date(2024, 11, 31),
+      scheduleType: ScheduleTypeEnum.NoSchool,
+      reason: 'Winter Break',
+    },
+    {
+      date: new Date(2025, 0, 1),
+      scheduleType: ScheduleTypeEnum.NoSchool,
+      reason: 'Winter Break',
+    },
+    {
+      date: new Date(2025, 0, 2),
+      scheduleType: ScheduleTypeEnum.NoSchool,
+      reason: 'Winter Break',
+    },
+    {
+      date: new Date(2025, 0, 3),
+      scheduleType: ScheduleTypeEnum.NoSchool,
+      reason: 'Winter Break',
+    },
+    {
+      date: new Date(2025, 0, 20),
+      scheduleType: ScheduleTypeEnum.NoSchool,
+      reason: 'MLK Jr. Day',
+    },
+    {
+      date: new Date(2025, 1, 14),
+      scheduleType: ScheduleTypeEnum.NoSchool,
+      reason: 'Mid-Winter Break',
+    },
+    {
+      date: new Date(2025, 1, 17),
+      scheduleType: ScheduleTypeEnum.NoSchool,
+      reason: 'Mid-Winter Break',
+    },
+    {
+      date: new Date(2025, 2, 21),
+      scheduleType: ScheduleTypeEnum.NoSchool,
+      reason: 'Spring Break',
+    },
+    {
+      date: new Date(2025, 2, 24),
+      scheduleType: ScheduleTypeEnum.NoSchool,
+      reason: 'Spring Break',
+    },
+    {
+      date: new Date(2025, 2, 25),
+      scheduleType: ScheduleTypeEnum.NoSchool,
+      reason: 'Spring Break',
+    },
+    {
+      date: new Date(2025, 2, 26),
+      scheduleType: ScheduleTypeEnum.NoSchool,
+      reason: 'Spring Break',
+    },
+    {
+      date: new Date(2025, 2, 27),
+      scheduleType: ScheduleTypeEnum.NoSchool,
+      reason: 'Spring Break',
+    },
+    {
+      date: new Date(2025, 2, 28),
+      scheduleType: ScheduleTypeEnum.NoSchool,
+      reason: 'Spring Break',
+    },
+    {
+      date: new Date(2025, 4, 23),
+      scheduleType: ScheduleTypeEnum.NoSchool,
+      reason: 'Memorial Day Break',
+    },
+    {
+      date: new Date(2025, 4, 26),
+      scheduleType: ScheduleTypeEnum.NoSchool,
+      reason: 'Memorial Day Break',
+    },
+  ];
+
+  private readonly _halfDayOverrides: ScheduleOverride[] = [
+    {
+      date: new Date(2024, 8, 26),
+      scheduleType: ScheduleTypeEnum.HalfDay1Through3,
+      reason: 'Parent/Teacher Conferences',
+    },
+    {
+      date: new Date(2024, 8, 27),
+      scheduleType: ScheduleTypeEnum.HalfDay1Through3,
+      reason: 'Parent/Teacher Conferences',
+    },
+    {
+      date: new Date(2025, 0, 15),
+      scheduleType: ScheduleTypeEnum.HalfDay1Through3,
+      reason: 'Exams',
+    },
+    {
+      date: new Date(2025, 0, 16),
+      scheduleType: ScheduleTypeEnum.HalfDay1Through3,
+      reason: 'Exams',
+    },
+    {
+      date: new Date(2025, 0, 17),
+      scheduleType: ScheduleTypeEnum.HalfDay1Through3,
+      reason: 'Exams',
+    },
+    {
+      date: new Date(2025, 2, 6),
+      scheduleType: ScheduleTypeEnum.HalfDay1Through3,
+      reason: 'Parent/Teacher Conferences',
+    },
+    {
+      date: new Date(2025, 2, 7),
+      scheduleType: ScheduleTypeEnum.HalfDay1Through3,
+      reason: 'Parent/Teacher Conferences',
+    },
+    {
+      date: new Date(2025, 5, 10),
+      scheduleType: ScheduleTypeEnum.HalfDay1Through3,
+      reason: 'Exams',
+    },
+    {
+      date: new Date(2025, 5, 11),
+      scheduleType: ScheduleTypeEnum.HalfDay1Through3,
+      reason: 'Exams',
+    },
+    {
+      date: new Date(2025, 5, 12),
+      scheduleType: ScheduleTypeEnum.HalfDay1Through3,
+      reason: 'Exams',
+    },
+  ];
+
+  private readonly _overrides: ScheduleOverride[] = [
+    ...this._noSchoolOverrides,
+    ...this._halfDayOverrides,
+  ];
+
+  get todaysScheduleType(): ScheduleTypeEnum {
+    const today = new Date();
+    return this.getScheduleTypeForDate(today);
+  }
+
+  private getScheduleTypeForDate(date: Date): ScheduleTypeEnum {
+    return (
+      this.getOverriddenScheduleTypeForDate(date) ??
+      this.getDefaultScheduleForDayOfWeek(date)
+    );
+  }
+
+  private getOverriddenScheduleTypeForDate(
+    date: Date
+  ): ScheduleTypeEnum | undefined {
+    return this._overrides.find(
+      (x) =>
+        x.date.getDate() === date.getDate() &&
+        x.date.getMonth() === date.getMonth() &&
+        x.date.getFullYear() === date.getFullYear()
+    )?.scheduleType;
+  }
+
+  private getDefaultScheduleForDayOfWeek(date: Date): ScheduleTypeEnum {
+    const dayOfWeek = date.getDay();
+    switch (dayOfWeek) {
+      case 1:
+        return ScheduleTypeEnum.Standard; // Monday
+      case 2:
+        return ScheduleTypeEnum.RamTime; // Tuesday
+      case 3:
+        return ScheduleTypeEnum.EarlyRelease; // Wednesday
+      case 4:
+        return ScheduleTypeEnum.RamTime; // Thursday
+      case 5:
+        return ScheduleTypeEnum.Standard; // Friday
+      default:
+        return ScheduleTypeEnum.NoSchool;
+    }
+  }
+}
+
+interface ScheduleOverride {
+  date: Date;
+  scheduleType: ScheduleTypeEnum;
+  reason: string;
+}
