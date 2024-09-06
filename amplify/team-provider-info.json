@@ -1,0 +1,15 @@
+{
+  "dev": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-holtschedule-dev-a709f-authRole",
+      "UnauthRoleArn": "arn:aws:iam::421435376899:role/amplify-holtschedule-dev-a709f-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::421435376899:role/amplify-holtschedule-dev-a709f-authRole",
+      "Region": "us-east-1",
+      "DeploymentBucketName": "amplify-holtschedule-dev-a709f-deployment",
+      "UnauthRoleName": "amplify-holtschedule-dev-a709f-unauthRole",
+      "StackName": "amplify-holtschedule-dev-a709f",
+      "StackId": "arn:aws:cloudformation:us-east-1:421435376899:stack/amplify-holtschedule-dev-a709f/ca189b90-6bf3-11ef-a2de-1226d593b7e7",
+      "AmplifyAppId": "d36jvzhbt6diy2"
+    }
+  }
+}
