@@ -1,11 +1,14 @@
-import { Injectable } from '@angular/core';
-import { ScheduleTypeEnum } from '../models/ScheduleType';
+import { ScheduleType, ScheduleTypeEnum } from '../models/ScheduleType';
+import { TimeService } from './time.service';
+import { inject, Injectable } from '@angular/core';
+import { map, Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ScheduleOverrideService {
   constructor() {}
+  private timeService = inject(TimeService);
 
   private readonly _noSchoolOverrides: ScheduleOverride[] = [
     {
@@ -168,22 +171,22 @@ export class ScheduleOverrideService {
     },
     {
       date: new Date(2024, 8, 27),
-      scheduleType: ScheduleTypeEnum.HalfDay1Through3,
+      scheduleType: ScheduleTypeEnum.HalfDay4Through6,
       reason: 'Parent/Teacher Conferences',
     },
     {
       date: new Date(2025, 0, 15),
-      scheduleType: ScheduleTypeEnum.HalfDay1Through3,
+      scheduleType: ScheduleTypeEnum.HalfDay1And2,
       reason: 'Exams',
     },
     {
       date: new Date(2025, 0, 16),
-      scheduleType: ScheduleTypeEnum.HalfDay1Through3,
+      scheduleType: ScheduleTypeEnum.HalfDay3And4,
       reason: 'Exams',
     },
     {
       date: new Date(2025, 0, 17),
-      scheduleType: ScheduleTypeEnum.HalfDay1Through3,
+      scheduleType: ScheduleTypeEnum.HalfDay5And6,
       reason: 'Exams',
     },
     {
@@ -193,35 +196,42 @@ export class ScheduleOverrideService {
     },
     {
       date: new Date(2025, 2, 7),
-      scheduleType: ScheduleTypeEnum.HalfDay1Through3,
+      scheduleType: ScheduleTypeEnum.HalfDay4Through6,
       reason: 'Parent/Teacher Conferences',
     },
     {
       date: new Date(2025, 5, 10),
-      scheduleType: ScheduleTypeEnum.HalfDay1Through3,
+      scheduleType: ScheduleTypeEnum.HalfDay1And2,
       reason: 'Exams',
     },
     {
       date: new Date(2025, 5, 11),
-      scheduleType: ScheduleTypeEnum.HalfDay1Through3,
+      scheduleType: ScheduleTypeEnum.HalfDay3And4,
       reason: 'Exams',
     },
     {
       date: new Date(2025, 5, 12),
-      scheduleType: ScheduleTypeEnum.HalfDay1Through3,
+      scheduleType: ScheduleTypeEnum.HalfDay5And6,
       reason: 'Exams',
     },
+  ];
+
+  private readonly _pepRallyOverrides: ScheduleOverride[] = [
+    // TODO: Add PEP Rally overrides
   ];
 
   private readonly _overrides: ScheduleOverride[] = [
     ...this._noSchoolOverrides,
     ...this._halfDayOverrides,
+    ...this._pepRallyOverrides,
   ];
 
-  get todaysScheduleType(): ScheduleTypeEnum {
-    const today = new Date();
-    return this.getScheduleTypeForDate(today);
-  }
+  todayScheduleType$: Observable<ScheduleType> =
+    this.timeService.dateChange$.pipe(
+      map((date: Date) => {
+        return new ScheduleType(this.getScheduleTypeForDate(date));
+      })
+    );
 
   private getScheduleTypeForDate(date: Date): ScheduleTypeEnum {
     return (

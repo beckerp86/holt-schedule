@@ -1,7 +1,8 @@
+import { CommonModule } from '@angular/common';
 import { Component, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import { ScheduleOverrideService } from '../sevices/schedule-override.service';
 import { TimeService } from '../sevices/time.service';
-import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-root',
@@ -11,5 +12,6 @@ import { CommonModule } from '@angular/common';
   styleUrl: './app.component.css',
 })
 export class AppComponent {
-  public svc = inject(TimeService);
+  public timeService = inject(TimeService);
+  public scheduleOverrideService = inject(ScheduleOverrideService);
 }

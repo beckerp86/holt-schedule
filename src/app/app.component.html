@@ -1,8 +1,10 @@
 <div class="flex-container">
   <div class="header">
-    <span class="date">{{ svc.currentDateDisplay$ | async }}</span>
-    <span class="time">{{ svc.currentTimeDisplay$ | async }}</span>
-    <span class="schedule-type">Standard</span>
+    <span class="date">{{ timeService.currentDateDisplay$ | async }}</span>
+    <span class="time">{{ timeService.currentTimeDisplay$ | async }}</span>
+    <span class="schedule-type">{{
+      (scheduleOverrideService.todayScheduleType$ | async)?.typeDescription
+    }}</span>
   </div>
   <div class="track">
     <div class="activity">

@@ -16,6 +16,9 @@ export class TimeService {
   private _currentDateSubject = new BehaviorSubject<Date>(new Date());
   public currentDate$ = this._currentDateSubject.asObservable();
 
+  private _dateChangeSubject = new BehaviorSubject<Date>(new Date());
+  public dateChange$ = this._dateChangeSubject.asObservable();
+
   constructor() {
     const constructionDate = new Date();
     this._currentDateSubject.next(constructionDate);
@@ -41,6 +44,7 @@ export class TimeService {
   }
 
   private setNewDateDisplay(date: Date): void {
+    this._dateChangeSubject.next(date);
     const newDateDisplay = DateUtil.getDateDisplayStringForDate(date);
     this._currentDateDisplaySubject.next(newDateDisplay);
   }
