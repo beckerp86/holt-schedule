@@ -217,7 +217,15 @@ export class ScheduleOverrideService {
   ];
 
   private readonly _pepRallyOverrides: ScheduleOverride[] = [
-    // TODO: Add PEP Rally overrides
+    {
+      date: new Date(2024, 8, 27),
+      scheduleType: ScheduleTypeEnum.PepRally,
+    },
+    {
+      // TODO: Get Pep Rally dates from Heather
+      date: new Date(2024, 8, 27),
+      scheduleType: ScheduleTypeEnum.PepRally,
+    },
   ];
 
   private readonly _overrides: ScheduleOverride[] = [
@@ -273,5 +281,5 @@ export class ScheduleOverrideService {
 interface ScheduleOverride {
   date: Date;
   scheduleType: ScheduleTypeEnum;
-  reason: string;
+  reason?: string;
 }

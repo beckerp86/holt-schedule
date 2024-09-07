@@ -14,6 +14,15 @@ export abstract class TimeUtil {
     );
   }
 
+  public static getEndDateForDuration(
+    startDateTime: Date,
+    durationMinutes: number
+  ): Date {
+    const endDate = new Date(startDateTime);
+    endDate.setMinutes(startDateTime.getMinutes() + durationMinutes);
+    return endDate;
+  }
+
   public static getTimeDisplayStringForDate(date: Date): string {
     const hours = date.getHours();
     const amPmHours = TimeUtil.getAmPmHours(hours);

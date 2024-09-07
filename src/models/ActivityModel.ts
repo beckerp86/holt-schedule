@@ -1,14 +1,13 @@
-export class Activity {
-  private _type: ActivityTypeEnum;
-  private _startHour: number;
-  private _startMinute: number;
-  private _durationMinutes: number;
-  private _warnWhenMinutesRemain: number;
-  private _startDate: Date;
+import { TimeUtil } from '../utils/TimeUtil';
 
-  get startDate(): Date {
-    return this._startDate;
-  }
+export class Activity {
+  private readonly _type: ActivityTypeEnum;
+  readonly _startHour: number;
+  readonly _startMinute: number;
+  readonly _durationMinutes: number;
+  readonly _warnWhenMinutesRemain: number;
+  readonly _startDate: Date;
+  readonly _endDate: Date;
 
   constructor(
     typeEnum: ActivityTypeEnum,
@@ -30,6 +29,11 @@ export class Activity {
       startDate.getDate(),
       startHour,
       startMinute
+    );
+
+    this._endDate = TimeUtil.getEndDateForDuration(
+      this._startDate,
+      durationMinutes
     );
   }
 
