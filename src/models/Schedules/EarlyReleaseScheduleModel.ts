@@ -1,33 +1,30 @@
-import { Schedule } from './ScheduleModel';
-import { ScheduleTypeEnum } from '../ScheduleType';
+import { Activity, ActivityTypeEnum } from '../ActivityModel';
 
-export class EarlyReleaseSchedule extends Schedule {
-  override readonly type = ScheduleTypeEnum.EarlyRelease;
+export class EarlyReleaseSchedule {
+  public activities: Activity[];
+  constructor() {
+    this.activities = [
+      new Activity(ActivityTypeEnum.FirstHour, 7, 30, 42, 2),
+      new Activity(ActivityTypeEnum.Transition, 8, 12, 5),
+      new Activity(ActivityTypeEnum.SecondHour, 8, 17, 41, 2),
+      new Activity(ActivityTypeEnum.Transition, 8, 58, 5),
+      new Activity(ActivityTypeEnum.ThirdHour, 9, 3, 41, 2),
+      new Activity(ActivityTypeEnum.Transition, 9, 44, 5),
+      new Activity(ActivityTypeEnum.FourthHour, 9, 49, 41, 2),
+      new Activity(ActivityTypeEnum.Transition, 10, 30, 5),
 
-  override readonly firstHourStartTime = '07:30';
-  override readonly firstHourDurationMinutes = 42;
+      // A Lunch
+      new Activity(ActivityTypeEnum.ALunch, 10, 35, 25),
+      new Activity(ActivityTypeEnum.ALunchTransition, 11, 0, 5),
+      new Activity(ActivityTypeEnum.ALunchClass, 11, 5, 41, 2),
 
-  override readonly secondHourStartTime = '08:17';
-  override readonly secondHourDurationMinutes = 45;
+      // B Lunch
+      new Activity(ActivityTypeEnum.BLunchClass, 10, 35, 41, 2),
+      new Activity(ActivityTypeEnum.BLunchTransition, 11, 16, 5),
+      new Activity(ActivityTypeEnum.BLunch, 11, 21, 25),
 
-  override readonly thirdHourStartTime = '09:03';
-  override readonly thirdHourDurationMinutes = 41;
-
-  override readonly fourthHourStartTime = '09:49';
-  override readonly fourthHourDurationMinutes = 41;
-
-  override readonly aLunchStartTime = '10:58';
-  override readonly aLunchDurationMinutes = this.standardLunchDuration;
-
-  override readonly bLunchStartTime = '11:21';
-  override readonly bLunchDurationMinutes = this.standardLunchDuration;
-
-  override readonly fifthHourStartTime = '10:35';
-  override readonly fifthHourDurationMinutes = 41;
-
-  override readonly sixthHourStartTime = '11:51';
-  override readonly sixthHourDurationMinutes = 44;
-
-  override readonly ramtimeStartTime = undefined;
-  override readonly ramtimeDurationMinutes = undefined;
+      new Activity(ActivityTypeEnum.Transition, 11, 46, 5),
+      new Activity(ActivityTypeEnum.SixthHour, 11, 51, 41, 2),
+    ];
+  }
 }
