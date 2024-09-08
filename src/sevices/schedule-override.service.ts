@@ -1,4 +1,5 @@
-import { ScheduleType, ScheduleTypeEnum } from '../models/ScheduleType';
+import { ScheduleType } from '../models/ScheduleType';
+import { ScheduleTypeEnum } from '../models/ScheduleTypeEnum';
 import { TimeService } from './time.service';
 import { inject, Injectable } from '@angular/core';
 import { map, Observable } from 'rxjs';

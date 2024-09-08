@@ -1,17 +1,21 @@
+import { ScheduleModel } from './Schedules/ScheduleModel';
+import { ScheduleTypeEnum } from './ScheduleTypeEnum';
+
 export class ScheduleType {
-  private _type: ScheduleTypeEnum;
-  private _overrideReason: string | undefined;
+  public readonly schedule?: ScheduleModel; // TODO: populate this classmember
+  protected readonly typeEnum: ScheduleTypeEnum;
+  private readonly _overrideReason: string | undefined;
 
   constructor(
     typeEnum: ScheduleTypeEnum,
     overrideReason: string | undefined = undefined
   ) {
-    this._type = typeEnum;
+    this.typeEnum = typeEnum;
     this._overrideReason = overrideReason;
   }
 
   get typeDescription(): string {
-    switch (this._type) {
+    switch (this.typeEnum) {
       case ScheduleTypeEnum.NoSchool:
         return this.getTypeDescriptionWithOverrideReason('No School');
       case ScheduleTypeEnum.HalfDay1And2:
@@ -48,17 +52,4 @@ export class ScheduleType {
       ? typeDescription
       : `${typeDescription} | (${this._overrideReason})`;
   }
-}
-
-export enum ScheduleTypeEnum {
-  NoSchool = 0,
-  EarlyRelease,
-  HalfDay1And2,
-  HalfDay1Through3,
-  HalfDay3And4,
-  HalfDay4Through6,
-  HalfDay5And6,
-  PepRally,
-  RamTime,
-  Standard,
 }
