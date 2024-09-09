@@ -128,6 +128,7 @@ export class ActivityComponent implements OnInit, AfterViewInit, OnDestroy {
     if (this.isComplete) {
       this.ngUnsubscribe$.next(null);
       this.ngUnsubscribe$.complete();
+      this._containerElement?.classList.add('falling');
     }
   }
 
