@@ -6,6 +6,11 @@ import { EnvironmentService } from '../sevices/environment.service';
   providedIn: 'root',
 })
 export class AudioService {
+  private readonly _audioContext: AudioContext = new AudioContext();
+  private _sourceNode?: AudioBufferSourceNode;
+
+  constructor() {}
+
   private environmentService = inject(EnvironmentService);
   private _isAudioEnabledByUser = false;
 
@@ -17,9 +22,28 @@ export class AudioService {
     this._isAudioEnabledByUser = !this._isAudioEnabledByUser;
   }
 
-  public playMp3(audioFileEnum: AudioFileEnum): void {
+  public async playMp3Async(audioFileEnum: AudioFileEnum): Promise<void> {
     if (!this.isAudioEnabled) return;
-    new Audio(`${this.environmentService.assetsPath}/${audioFileEnum.toString()}.mp3`).play();
+    try {
+      const url = this.getFilepath(audioFileEnum);
+      const response = await fetch(url);
+      const arrayBuffer = await response.arrayBuffer();
+      const audioBuffer = await this._audioContext.decodeAudioData(arrayBuffer);
+
+      if (this._sourceNode) {
+        this._sourceNode.stop();
+      }
+      this._sourceNode = this._audioContext.createBufferSource();
+      this._sourceNode.buffer = audioBuffer;
+      this._sourceNode.connect(this._audioContext.destination);
+      this._sourceNode.start(0);
+    } catch (error) {
+      console.error('Error loading or decoding audio:', error);
+    }
+  }
+
+  private getFilepath(audioFileEnum: AudioFileEnum): string {
+    return `${this.environmentService.assetsPath}/${audioFileEnum.toString()}.mp3`;
   }
 }
 

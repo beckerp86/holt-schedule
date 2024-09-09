@@ -229,10 +229,86 @@ export class ScheduleOverrideService {
     // },
   ];
 
+  private readonly _earlyReleaseWednesdayOverrides: ScheduleOverride[] = [
+    {
+      date: new Date(2024, 8, 11),
+      scheduleType: ScheduleTypeEnum.EarlyRelease,
+    },
+    {
+      date: new Date(2024, 9, 9),
+      scheduleType: ScheduleTypeEnum.EarlyRelease,
+    },
+    {
+      date: new Date(2024, 9, 23),
+      scheduleType: ScheduleTypeEnum.EarlyRelease,
+    },
+    {
+      date: new Date(2024, 10, 6),
+      scheduleType: ScheduleTypeEnum.EarlyRelease,
+    },
+    {
+      date: new Date(2024, 10, 20),
+      scheduleType: ScheduleTypeEnum.EarlyRelease,
+    },
+    {
+      date: new Date(2024, 11, 4),
+      scheduleType: ScheduleTypeEnum.EarlyRelease,
+    },
+    {
+      date: new Date(2024, 11, 11),
+      scheduleType: ScheduleTypeEnum.EarlyRelease,
+    },
+    {
+      date: new Date(2025, 0, 8),
+      scheduleType: ScheduleTypeEnum.EarlyRelease,
+    },
+    {
+      date: new Date(2025, 0, 22),
+      scheduleType: ScheduleTypeEnum.EarlyRelease,
+    },
+    {
+      date: new Date(2025, 1, 5),
+      scheduleType: ScheduleTypeEnum.EarlyRelease,
+    },
+    {
+      date: new Date(2025, 1, 19),
+      scheduleType: ScheduleTypeEnum.EarlyRelease,
+    },
+    {
+      date: new Date(2025, 2, 12),
+      scheduleType: ScheduleTypeEnum.EarlyRelease,
+    },
+    {
+      date: new Date(2025, 2, 19),
+      scheduleType: ScheduleTypeEnum.EarlyRelease,
+    },
+    {
+      date: new Date(2025, 3, 2),
+      scheduleType: ScheduleTypeEnum.EarlyRelease,
+    },
+    {
+      date: new Date(2025, 3, 23),
+      scheduleType: ScheduleTypeEnum.EarlyRelease,
+    },
+    {
+      date: new Date(2025, 4, 7),
+      scheduleType: ScheduleTypeEnum.EarlyRelease,
+    },
+    {
+      date: new Date(2025, 4, 21),
+      scheduleType: ScheduleTypeEnum.EarlyRelease,
+    },
+    {
+      date: new Date(2025, 4, 28),
+      scheduleType: ScheduleTypeEnum.EarlyRelease,
+    },
+  ];
+
   private readonly _overrides: ScheduleOverride[] = [
     ...this._noSchoolOverrides,
     ...this._halfDayOverrides,
     ...this._pepRallyOverrides,
+    ...this._earlyReleaseWednesdayOverrides,
   ];
 
   todaySchedule$: Observable<DailySchedule> = this.timeService.dateChange$.pipe(
@@ -262,7 +338,7 @@ export class ScheduleOverrideService {
       case 2:
         return ScheduleTypeEnum.RamTime; // Tuesday
       case 3:
-        return ScheduleTypeEnum.EarlyRelease; // Wednesday
+        return ScheduleTypeEnum.Standard; // Wednesday
       case 4:
         return ScheduleTypeEnum.RamTime; // Thursday
       case 5:

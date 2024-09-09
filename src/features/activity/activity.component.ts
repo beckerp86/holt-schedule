@@ -132,7 +132,7 @@ export class ActivityComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  private playWarningChime(nowMs: number): void {
+  private async playWarningChime(nowMs: number): Promise<void> {
     if (
       !this.activity ||
       this.playedWarningChime ||
@@ -142,7 +142,7 @@ export class ActivityComponent implements OnInit, AfterViewInit, OnDestroy {
     }
     const chimeMs = this._endMs - this.activity._warnWhenMinutesRemain * 60 * 1000;
     if (nowMs >= chimeMs) {
-      this.audioService.playMp3(AudioFileEnum.Chime);
+      await this.audioService.playMp3Async(AudioFileEnum.Chime);
       this.playedWarningChime = true;
     }
   }
