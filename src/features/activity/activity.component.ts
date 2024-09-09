@@ -6,6 +6,8 @@ import { ResizeObservableService } from '../../sevices/resize-observable.service
 import { ScheduleOverrideService } from '../../sevices/schedule-override.service';
 import { TimeService } from '../../sevices/time.service';
 import { TimeUtil } from '../../utils/TimeUtil';
+import { NumberUtil } from '../../utils/NumberUtil';
+import { AudioUtil } from '../../utils/AudioUtil';
 
 @Component({
   selector: 'app-activity',
@@ -26,6 +28,7 @@ export class ActivityComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private ngUnsubscribe$ = new Subject();
   private isComplete = false;
+  private playedWarningChime = false;
 
   private _startMs: number = 0;
   private _endMs: number = 0;
@@ -47,8 +50,10 @@ export class ActivityComponent implements OnInit, AfterViewInit, OnDestroy {
     of(null)
       .pipe(repeat({ delay: 1000 }), takeUntil(this.ngUnsubscribe$))
       .subscribe(() => {
-        this.updatePercentComplete();
+        const nowMs = new Date().getTime();
+        this.updatePercentComplete(nowMs);
         this.updateCountdownDisplay();
+        this.playWarningChime(nowMs);
       });
 
     // updates progress bar width observable
@@ -98,8 +103,7 @@ export class ActivityComponent implements OnInit, AfterViewInit, OnDestroy {
     this.ngUnsubscribe$.complete();
   }
 
-  private updatePercentComplete(): void {
-    const nowMs = new Date().getTime();
+  private updatePercentComplete(nowMs: number): void {
     let percentComplete = (nowMs - this._startMs) / (this._endMs - this._startMs);
     percentComplete > 1 ? 1 : percentComplete; // cap percent complete at 100%
 
@@ -124,6 +128,21 @@ export class ActivityComponent implements OnInit, AfterViewInit, OnDestroy {
     if (this.isComplete) {
       this.ngUnsubscribe$.next(null);
       this.ngUnsubscribe$.complete();
+    }
+  }
+
+  private playWarningChime(nowMs: number): void {
+    if (
+      !this.activity ||
+      this.playedWarningChime ||
+      !NumberUtil.IsPositiveInteger(this.activity._warnWhenMinutesRemain)
+    ) {
+      return;
+    }
+    const chimeMs = this._endMs - this.activity._warnWhenMinutesRemain * 60 * 1000;
+    if (nowMs >= chimeMs) {
+      AudioUtil.playChime();
+      this.playedWarningChime = true;
     }
   }
 }
