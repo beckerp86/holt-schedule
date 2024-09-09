@@ -1,17 +1,13 @@
-import { CommonModule } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { ActivityComponent } from "../features/activity/activity.component";
+import { Component } from '@angular/core';
+import { HeaderComponent } from "../features/header/header.component";
 import { RouterOutlet } from '@angular/router';
-import { ScheduleOverrideService } from '../sevices/schedule-override.service';
-import { TimeService } from '../sevices/time.service';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, CommonModule],
+  imports: [RouterOutlet, ActivityComponent, HeaderComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css',
 })
-export class AppComponent {
-  public timeService = inject(TimeService);
-  public scheduleOverrideService = inject(ScheduleOverrideService);
-}
+export class AppComponent {}

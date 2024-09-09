@@ -1,0 +1,33 @@
+.activity-container {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  justify-content: space-around;
+
+  &:before {
+    content: "";
+    position: absolute;
+    margin: 13px;
+    border: 5px solid transparent;
+    border-radius: 10px;
+    width: calc(98vw);
+    height: calc(25vh - 8px);
+    background-color: rgb(255, 165, 0, 0.4);
+    transition: linear 5s width;
+  }
+
+  .activity {
+    display: flex;
+    height: 25vh;
+    margin: 10px;
+    padding-left: 1vw;
+    padding-right: 1vw;
+    border: 5px solid var(--HPS_Gold);
+    border-radius: 10px;
+    align-items: center;
+    justify-content: space-between;
+    font-family: "Roboto";
+    font-weight: 700;
+    font-size: 10vh;
+  }
+}

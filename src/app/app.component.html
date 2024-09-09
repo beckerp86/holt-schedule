@@ -1,21 +1,5 @@
 <div class="flex-container">
-  <div class="header">
-    <span class="date">{{ timeService.currentDateDisplay$ | async }}</span>
-    <span class="time">{{ timeService.currentTimeDisplay$ | async }}</span>
-    <span class="schedule-type">{{
-      (scheduleOverrideService.todayScheduleType$ | async)?.typeDescription
-    }}</span>
-  </div>
-  <div class="activity-container">
-    <div class="activity">
-      <span class="activity-name">A Lunch</span>
-      <span class="activity-duration"> (25:00)</span>
-    </div>
-  </div>
-  <div class="activity-container">
-    <div class="activity">
-      <span class="activity-name">A Lunch</span>
-      <span class="activity-duration"> (25:00)</span>
-    </div>
-  </div>
+  <app-header></app-header>
+  <app-activity></app-activity>
+  <app-activity></app-activity>
 </div>

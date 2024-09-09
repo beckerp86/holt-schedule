@@ -1,4 +1,4 @@
-import { ScheduleType } from '../models/ScheduleType';
+import { DailySchedule } from '../models/DailySchedule';
 import { ScheduleTypeEnum } from '../models/ScheduleTypeEnum';
 import { TimeService } from './time.service';
 import { inject, Injectable } from '@angular/core';
@@ -235,12 +235,11 @@ export class ScheduleOverrideService {
     ...this._pepRallyOverrides,
   ];
 
-  todayScheduleType$: Observable<ScheduleType> =
-    this.timeService.dateChange$.pipe(
-      map((date: Date) => {
-        return new ScheduleType(this.getScheduleTypeForDate(date));
-      })
-    );
+  todaySchedule$: Observable<DailySchedule> = this.timeService.dateChange$.pipe(
+    map((date: Date) => {
+      return new DailySchedule(this.getScheduleTypeForDate(date));
+    })
+  );
 
   private getScheduleTypeForDate(date: Date): ScheduleTypeEnum {
     return (
