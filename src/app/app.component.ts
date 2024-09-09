@@ -51,7 +51,7 @@ export class AppComponent {
         (nowHour < x._endDate.getHours() || (nowHour === x._endDate.getHours() && nowMinute <= x._endDate.getMinutes()))
       );
     });
-    this.currentActivitiesSubject.next(currentActivities);
+    // this.currentActivitiesSubject.next(currentActivities); commented to tweak styling
   }
 
   private handleDevTesting(): void {
@@ -60,9 +60,10 @@ export class AppComponent {
     const nowHours = now.getHours();
     const nowMinutes = now.getMinutes();
 
-    const activity1 = new Activity(ActivityTypeEnum.FirstHour, nowHours, nowMinutes, 5, 2);
-    const activity2 = new Activity(ActivityTypeEnum.SecondHour, nowHours, nowMinutes, 3, 2);
+    const activity1 = new Activity(ActivityTypeEnum.FirstHour, nowHours, nowMinutes, 3, 2);
+    const activity2 = new Activity(ActivityTypeEnum.SecondHour, nowHours, nowMinutes, 2, 2);
     const activity3 = new Activity(ActivityTypeEnum.ThirdHour, nowHours, nowMinutes, 1, 2);
     this.activities = [activity1, activity2, activity3];
+    this.currentActivitiesSubject.next(this.activities);
   }
 }

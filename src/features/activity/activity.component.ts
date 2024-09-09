@@ -1,6 +1,6 @@
 import { Activity } from '../../models/ActivityModel';
 import { AfterViewInit, Component, inject, Input, OnDestroy, OnInit } from '@angular/core';
-import { BehaviorSubject, combineLatest, debounceTime, Observable, of, repeat, Subject, takeUntil } from 'rxjs';
+import { BehaviorSubject, combineLatest, debounceTime, of, repeat, Subject, takeUntil } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { ResizeObservableService } from '../../sevices/resize-observable.service';
 import { ScheduleOverrideService } from '../../sevices/schedule-override.service';
@@ -22,8 +22,10 @@ export class ActivityComponent implements OnInit, AfterViewInit, OnDestroy {
   private resizeService = inject(ResizeObservableService);
 
   public htmlId = crypto.randomUUID();
+  private _containerElement: HTMLElement | null = null;
 
   private ngUnsubscribe$ = new Subject();
+  private isComplete = false;
 
   private _startMs: number = 0;
   private _endMs: number = 0;
@@ -37,7 +39,8 @@ export class ActivityComponent implements OnInit, AfterViewInit, OnDestroy {
   private countdownDisplaySubject = new BehaviorSubject<string>('');
   public countdownDisplay$ = this.countdownDisplaySubject.asObservable();
 
-  public progressBarContainerPixelWidth$: Observable<number> = of(0);
+  private progressBarContainerPixelWidthSubject = new BehaviorSubject<number>(1920);
+  public progressBarContainerPixelWidth$ = this.progressBarContainerPixelWidthSubject.asObservable();
 
   constructor() {
     // updates percent complete observable
@@ -52,7 +55,17 @@ export class ActivityComponent implements OnInit, AfterViewInit, OnDestroy {
     combineLatest([this.percentComplete$, this.progressBarContainerPixelWidth$])
       .pipe(debounceTime(100), takeUntil(this.ngUnsubscribe$))
       .subscribe(([percentComplete, progressBarContainerPixelWidth]) => {
-        this.progressBarCurrentPixelWidthSubject.next(Math.floor(percentComplete * progressBarContainerPixelWidth));
+        if (
+          Number.isNaN(percentComplete) ||
+          !Number.isFinite(percentComplete) ||
+          Number.isNaN(progressBarContainerPixelWidth) ||
+          !Number.isFinite(progressBarContainerPixelWidth)
+        ) {
+          return;
+        }
+        this.isComplete = percentComplete >= 1;
+        const nextWidth = Math.floor(percentComplete * progressBarContainerPixelWidth);
+        this.progressBarCurrentPixelWidthSubject.next(nextWidth);
       });
   }
 
@@ -62,9 +75,21 @@ export class ActivityComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngAfterViewInit(): void {
-    this.progressBarContainerPixelWidth$ = this.resizeService
-    .widthResizeObservable(document.getElementById(this.htmlId)!)
-    .pipe(takeUntil(this.ngUnsubscribe$));
+    //add classmembers references to html elements
+    this._containerElement = document.getElementById(this.htmlId);
+
+    // Add resize observer to progress bar container
+    this.resizeService
+      .widthResizeObservable(this._containerElement!)
+      .pipe(takeUntil(this.ngUnsubscribe$))
+      .subscribe((widthPx: number) => {
+        this.progressBarContainerPixelWidthSubject.next(widthPx);
+      });
+
+    // Watch for intended width of actual progress bar, then go update the style
+    this.progressBarCurrentPixelWidth$.pipe(takeUntil(this.ngUnsubscribe$)).subscribe((widthPx: number) => {
+      this.updateProgressBarWidth(widthPx);
+    });
   }
 
   ngOnDestroy(): void {
@@ -75,7 +100,10 @@ export class ActivityComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private updatePercentComplete(): void {
     const nowMs = new Date().getTime();
-    this.percentCompleteSubject.next((nowMs - this._startMs) / (this._endMs - this._startMs));
+    let percentComplete = (nowMs - this._startMs) / (this._endMs - this._startMs);
+    percentComplete > 1 ? 1 : percentComplete; // cap percent complete at 100%
+
+    this.percentCompleteSubject.next(percentComplete);
   }
 
   private updateCountdownDisplay(): void {
@@ -84,5 +112,18 @@ export class ActivityComponent implements OnInit, AfterViewInit, OnDestroy {
     }
     const duration = TimeUtil.getDurationBetweenDates(new Date(), this.activity._endDate);
     this.countdownDisplaySubject.next(TimeUtil.getTimerDisplay(duration));
+  }
+
+  private updateProgressBarWidth(widthPx: number): void {
+    if (!this.activity) {
+      return;
+    }
+
+    // Sets pseudo element's width inline
+    this._containerElement?.style.setProperty('--before-width', `${widthPx}px`);
+    if (this.isComplete) {
+      this.ngUnsubscribe$.next(null);
+      this.ngUnsubscribe$.complete();
+    }
   }
 }

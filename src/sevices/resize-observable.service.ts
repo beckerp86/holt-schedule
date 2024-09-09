@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core';
-import { filter, map, NextObserver, Observable, Subscriber, throttleTime } from 'rxjs';
+import { distinctUntilChanged, filter, map, NextObserver, Observable, Subscriber, throttleTime } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ResizeObservableService {
+  private readonly _throttleTime: number = 100;
   private resizeObserver: ResizeObserver;
   private notifiers: NextObserver<ResizeObserverEntry[]>[] = [];
 
@@ -31,13 +32,14 @@ export class ResizeObservableService {
     return newObserverCandidate.pipe(
       map((entries) => entries.find((entry) => entry.target === elem)),
       filter(Boolean),
-      throttleTime(100)
+      throttleTime(this._throttleTime),
+      distinctUntilChanged()
     );
   }
 
   widthResizeObservable(elem: Element): Observable<number> {
     return this.resizeObservable(elem).pipe(
-      map((entry) => entry.borderBoxSize[0].inlineSize),
+      map((entry) => entry.target.clientWidth),
       filter(Boolean)
     );
   }

@@ -1,6 +1,6 @@
-import { Injectable } from '@angular/core';
 import { BehaviorSubject, of, pairwise, repeat } from 'rxjs';
 import { DateUtil } from '../utils/DateUtil';
+import { Injectable } from '@angular/core';
 import { TimeUtil } from '../utils/TimeUtil';
 
 @Injectable({

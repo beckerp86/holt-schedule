@@ -7,21 +7,22 @@
   &:before {
     content: "";
     position: absolute;
-    margin: 13px;
+    left: 10px;
     border: 5px solid transparent;
     border-radius: 10px;
-    width: calc(98vw);
-    height: calc(25vh - 8px);
+    width: var(--before-width, 1px);
+    max-width: calc(100vw - 35px);
+    height: 25vh;
     background-color: rgb(255, 165, 0, 0.4);
-    transition: linear 5s width;
+    transition: linear 1s width;
   }
 
   .activity {
     display: flex;
     height: 25vh;
     margin: 10px;
-    padding-left: 1vw;
-    padding-right: 1vw;
+    padding-left: 15px;
+    padding-right: 15px;
     border: 5px solid var(--HPS_Gold);
     border-radius: 10px;
     align-items: center;
