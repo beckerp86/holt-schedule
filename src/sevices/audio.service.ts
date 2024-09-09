@@ -24,26 +24,23 @@ export class AudioService {
 
   public async playMp3Async(audioFileEnum: AudioFileEnum): Promise<void> {
     if (!this.isAudioEnabled) return;
-    try {
-      const url = this.getFilepath(audioFileEnum);
-      const response = await fetch(url);
-      const arrayBuffer = await response.arrayBuffer();
-      const audioBuffer = await this._audioContext.decodeAudioData(arrayBuffer);
-
-      if (this._sourceNode) {
-        this._sourceNode.stop();
-      }
-      this._sourceNode = this._audioContext.createBufferSource();
-      this._sourceNode.buffer = audioBuffer;
-      this._sourceNode.connect(this._audioContext.destination);
-      this._sourceNode.start(0);
-    } catch (error) {
-      console.error('Error loading or decoding audio:', error);
-    }
+    const response = await fetch(this.getFilepath(audioFileEnum));
+    await this._audioContext.decodeAudioData(await response.arrayBuffer(), this.playFromBuffer.bind(this));
   }
 
   private getFilepath(audioFileEnum: AudioFileEnum): string {
     return `${this.environmentService.assetsPath}/${audioFileEnum.toString()}.mp3`;
+  }
+
+  private playFromBuffer(buffer: AudioBuffer): void {
+    if (this._sourceNode) {
+      this._sourceNode.stop();
+    }
+    this._sourceNode = this._audioContext.createBufferSource();
+    this._sourceNode.buffer = buffer;
+    this._sourceNode.connect(this._audioContext.destination);
+    this._sourceNode.loop = false;
+    this._sourceNode.start();
   }
 }
 

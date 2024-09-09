@@ -2,6 +2,11 @@
   --HPS_Brown: #593803;
   --HPS_Gold: #d79423;
 }
+html {
+  font-family: "Roboto", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+}
 
 body {
   margin: 0;
