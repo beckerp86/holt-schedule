@@ -1,8 +1,13 @@
+import { EarlyReleaseSchedule } from './Schedules/EarlyReleaseScheduleModel';
+import { HalfDaySchedule } from './Schedules/HalfDayScheduleModel';
+import { PepRallySchedule } from './Schedules/PepRallyScheduleModel';
+import { RamTimeSchedule } from './Schedules/RamTimeScheduleModel';
 import { ScheduleModel } from './Schedules/ScheduleModel';
 import { ScheduleTypeEnum } from './ScheduleTypeEnum';
+import { StandardSchedule } from './Schedules/StandardScheduleModel';
 
-export class ScheduleType {
-  public readonly schedule?: ScheduleModel; // TODO: populate this classmember
+export class DailySchedule {
+  public readonly schedule: ScheduleModel | undefined;
   protected readonly typeEnum: ScheduleTypeEnum;
   private readonly _overrideReason: string | undefined;
 
@@ -12,9 +17,42 @@ export class ScheduleType {
   ) {
     this.typeEnum = typeEnum;
     this._overrideReason = overrideReason;
+
+    switch (this.typeEnum) {
+      case ScheduleTypeEnum.EarlyRelease:
+        this.schedule = new EarlyReleaseSchedule();
+        break;
+      case ScheduleTypeEnum.RamTime:
+        this.schedule = new RamTimeSchedule();
+        break;
+      case ScheduleTypeEnum.Standard:
+        this.schedule = new StandardSchedule();
+        break;
+      case ScheduleTypeEnum.PepRally:
+        this.schedule = new PepRallySchedule();
+        break;
+      case ScheduleTypeEnum.HalfDay1And2:
+        this.schedule = new HalfDaySchedule(ScheduleTypeEnum.HalfDay1And2);
+        break;
+      case ScheduleTypeEnum.HalfDay3And4:
+        this.schedule = new HalfDaySchedule(ScheduleTypeEnum.HalfDay3And4);
+        break;
+      case ScheduleTypeEnum.HalfDay5And6:
+        this.schedule = new HalfDaySchedule(ScheduleTypeEnum.HalfDay5And6);
+        break;
+      case ScheduleTypeEnum.HalfDay1Through3:
+        this.schedule = new HalfDaySchedule(ScheduleTypeEnum.HalfDay1Through3);
+        break;
+      case ScheduleTypeEnum.HalfDay4Through6:
+        this.schedule = new HalfDaySchedule(ScheduleTypeEnum.HalfDay4Through6);
+        break;
+      default:
+        console.log(`Unknown schedule type: ${typeEnum}`);
+        break;
+    }
   }
 
-  get typeDescription(): string {
+  get scheduleDescription(): string {
     switch (this.typeEnum) {
       case ScheduleTypeEnum.NoSchool:
         return this.getTypeDescriptionWithOverrideReason('No School');
