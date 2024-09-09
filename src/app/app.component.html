@@ -1,5 +1,7 @@
 <div class="flex-container">
   <app-header></app-header>
-  <app-activity></app-activity>
-  <app-activity></app-activity>
+  <app-activity
+    *ngFor="let activity of currentActivities$ | async"
+    [activity]="activity"
+  ></app-activity>
 </div>

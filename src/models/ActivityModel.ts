@@ -30,11 +30,7 @@ export class Activity {
       startHour,
       startMinute
     );
-
-    this._endDate = TimeUtil.getEndDateForDuration(
-      this._startDate,
-      durationMinutes
-    );
+    this._endDate = TimeUtil.getEndDateForDuration(this._startDate, durationMinutes);
   }
 
   get typeDescription(): string {

@@ -1,4 +1,16 @@
 export abstract class NumberUtil {
+  public static IsPositiveInteger(num: number | string | undefined | null): boolean {
+    if (!num) {
+      return false;
+    }
+    if (typeof num === 'string') {
+      num = +num; // convert string to number using unary operator
+      if (isNaN(num)) {
+        return false;
+      }
+    }
+    return num > 0 && Number.isInteger(num);
+  }
   public static getOrdinalSuffix(num: number): string {
     if (num === 11 || num === 12 || num === 13) {
       return 'th';

@@ -1,6 +1,6 @@
-<div class="activity-container">
+<div class="activity-container" [id]="htmlId">
   <div class="activity">
-    <span class="activity-name">A Lunch</span>
-    <span class="activity-duration"> (25:00)</span>
+    <span class="activity-name">{{activity?.typeDescription}}</span>
+    <span class="activity-duration">{{countdownDisplay$ | async}}</span>
   </div>
 </div>

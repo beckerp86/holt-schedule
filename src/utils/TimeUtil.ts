@@ -5,19 +5,11 @@ export abstract class TimeUtil {
     return prev.getMinutes() !== next.getMinutes();
   }
 
-  public static getTimerDisplayBetweenTwoDates(
-    startDate: Date,
-    endDate: Date
-  ): string {
-    return TimeUtil.getTimerDisplay(
-      TimeUtil.getDurationBetweenDates(startDate, endDate)
-    );
+  public static getTimerDisplayBetweenTwoDates(startDate: Date, endDate: Date): string {
+    return TimeUtil.getTimerDisplay(TimeUtil.getDurationBetweenDates(startDate, endDate));
   }
 
-  public static getEndDateForDuration(
-    startDateTime: Date,
-    durationMinutes: number
-  ): Date {
+  public static getEndDateForDuration(startDateTime: Date, durationMinutes: number): Date {
     const endDate = new Date(startDateTime);
     endDate.setMinutes(startDateTime.getMinutes() + durationMinutes);
     return endDate;
@@ -27,16 +19,17 @@ export abstract class TimeUtil {
     const hours = date.getHours();
     const amPmHours = TimeUtil.getAmPmHours(hours);
     const minutes = date.getMinutes();
-    const timeDisplay = `${TimeUtil.getHoursDisplay(
-      amPmHours
-    )}:${TimeUtil.getMinutesDisplay(minutes)} ${TimeUtil.getAmPmDisplay(
-      hours
-    )}`;
+    const timeDisplay = `${TimeUtil.getHoursDisplay(amPmHours)}:${TimeUtil.getMinutesDisplay(
+      minutes
+    )} ${TimeUtil.getAmPmDisplay(hours)}`;
     return timeDisplay;
   }
 
-  private static getDurationBetweenDates(start: Date, end: Date): TimeDuration {
+  public static getDurationBetweenDates(start: Date, end: Date): TimeDuration {
     let msBetween = end.getTime() - start.getTime();
+    if (msBetween < 0) {
+      return new TimeDuration(0, 0);
+    }
 
     // Subtract full minutes
     const minutes = Math.floor(msBetween / (1000 * 60));
@@ -50,7 +43,7 @@ export abstract class TimeUtil {
     return new TimeDuration(minutes, seconds);
   }
 
-  private static getTimerDisplay(duration: TimeDuration): string {
+  public static getTimerDisplay(duration: TimeDuration): string {
     const minutesDisplay = duration.minutes.toString().padStart(2, '0');
     const secondsDisplay = duration.seconds.toString().padStart(2, '0');
 
@@ -58,6 +51,10 @@ export abstract class TimeUtil {
   }
 
   private static getAmPmHours(amPmHours: number): number {
+    if (amPmHours === 0) {
+      return 12; // deals with midnight
+    }
+
     return amPmHours > 12 ? amPmHours - 12 : amPmHours;
   }
 
