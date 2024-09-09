@@ -1,13 +1,12 @@
-import { Activity } from '../models/ActivityModel';
+import { Activity, ActivityTypeEnum } from '../models/ActivityModel';
 import { ActivityComponent } from '../features/activity/activity.component';
 import { ArrayUtil } from '../utils/ArrayUtil';
-import { BehaviorSubject, distinctUntilChanged } from 'rxjs';
+import { BehaviorSubject, distinctUntilChanged, of, repeat } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { Component, inject } from '@angular/core';
 import { HeaderComponent } from '../features/header/header.component';
 import { RouterOutlet } from '@angular/router';
 import { ScheduleOverrideService } from '../sevices/schedule-override.service';
-import { TimeService } from '../sevices/time.service';
 
 @Component({
   selector: 'app-root',
@@ -17,14 +16,19 @@ import { TimeService } from '../sevices/time.service';
   styleUrl: './app.component.css',
 })
 export class AppComponent {
-  private timeService = inject(TimeService);
   private scheduleOverrideService = inject(ScheduleOverrideService);
+
   private activities: Activity[] = [];
+  private _isDevTesting: boolean = true;
 
   private currentActivitiesSubject = new BehaviorSubject<Activity[]>([]);
   public currentActivities$ = this.currentActivitiesSubject.asObservable().pipe(distinctUntilChanged());
 
   constructor() {
+    if (this._isDevTesting) {
+      this.handleDevTesting();
+      return;
+    }
     // When date changes, fetch new day's schedule
     this.scheduleOverrideService.todaySchedule$.subscribe((schedule) => {
       if (schedule) {
@@ -32,12 +36,14 @@ export class AppComponent {
       }
     });
 
-    // When minute changes, filter activities for current time
-    this.timeService.currentTimeDisplay$.subscribe(() => {
-      if (ArrayUtil.IsArrayAndHasItems(this.activities)) {
-        this.updateCurrentActivities();
-      }
-    });
+    // Every second, check to make sure only the active activities are displayed
+    of(null)
+      .pipe(repeat({ delay: 1000 }))
+      .subscribe(() => {
+        if (ArrayUtil.IsArrayAndHasItems(this.activities)) {
+          this.updateCurrentActivities();
+        }
+      });
   }
 
   private updateCurrentActivities(): void {
@@ -50,5 +56,17 @@ export class AppComponent {
       );
     });
     this.currentActivitiesSubject.next(currentActivities);
+  }
+
+  private handleDevTesting(): void {
+    if (!this._isDevTesting) return;
+    const now = new Date();
+    const nowHours = now.getHours();
+    const nowMinutes = now.getMinutes();
+
+    const activity1 = new Activity(ActivityTypeEnum.FirstHour, nowHours, nowMinutes, 3, 2);
+    const activity2 = new Activity(ActivityTypeEnum.SecondHour, nowHours, nowMinutes, 2, 1);
+    this.activities = [activity1, activity2];
+    this.currentActivitiesSubject.next(this.activities);
   }
 }

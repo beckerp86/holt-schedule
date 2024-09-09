@@ -19,10 +19,6 @@ import { AudioFileEnum, AudioService } from '../../sevices/audio.service';
 export class ActivityComponent implements OnInit, AfterViewInit, OnDestroy {
   @Input() public activity?: Activity;
 
-  // FIXME: REMOVE AFTER TESTING
-  private _isTestingChimes = true;
-  // FIXME: REMOVE AFTER TESTING
-
   public timeService = inject(TimeService);
   public scheduleOverrideService = inject(ScheduleOverrideService);
   private resizeService = inject(ResizeObservableService);
@@ -137,12 +133,6 @@ export class ActivityComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private playWarningChime(nowMs: number): void {
-    if (this._isTestingChimes && !this.playedWarningChime) {
-      this.audioService.playMp3(AudioFileEnum.Chime);
-      this.playedWarningChime = true;
-      return;
-    }
-
     if (
       !this.activity ||
       this.playedWarningChime ||
