@@ -4,7 +4,9 @@ import { ScheduleModel } from './ScheduleModel';
 
 export class RamTimeSchedule extends ScheduleModel {
   constructor() {
-    super(ScheduleTypeEnum.RamTime, [
+    super(ScheduleTypeEnum.RamTime);
+
+    this.setActivitiesForType([
       new Activity(ActivityTypeEnum.FirstHour, 7, 30, 56, 2),
       new Activity(ActivityTypeEnum.Transition, 8, 26, 5),
       new Activity(ActivityTypeEnum.SecondHour, 8, 31, 56, 2),

@@ -1,12 +1,19 @@
 import { Activity } from '../ActivityModel';
 import { ScheduleTypeEnum } from '../ScheduleTypeEnum';
 
-export class ScheduleModel {
+export abstract class ScheduleModel {
+  private _activities: Activity[] = [];
   public readonly type: ScheduleTypeEnum;
-  public readonly activities: Activity[];
 
-  constructor(type: ScheduleTypeEnum, activities: Activity[]) {
+  get activities(): Activity[] {
+    return this._activities;
+  }
+
+  constructor(type: ScheduleTypeEnum) {
     this.type = type;
-    this.activities = activities;
+  }
+
+  public setActivitiesForType(activities: Activity[]) {
+    this._activities = activities;
   }
 }

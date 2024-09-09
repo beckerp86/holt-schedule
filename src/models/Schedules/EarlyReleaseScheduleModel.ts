@@ -4,7 +4,9 @@ import { ScheduleModel } from './ScheduleModel';
 
 export class EarlyReleaseSchedule extends ScheduleModel {
   constructor() {
-    super(ScheduleTypeEnum.EarlyRelease, [
+    super(ScheduleTypeEnum.EarlyRelease);
+
+    this.setActivitiesForType([
       new Activity(ActivityTypeEnum.FirstHour, 7, 30, 42, 2),
       new Activity(ActivityTypeEnum.Transition, 8, 12, 5),
       new Activity(ActivityTypeEnum.SecondHour, 8, 17, 41, 2),

@@ -4,7 +4,9 @@ import { ScheduleModel } from './ScheduleModel';
 
 export class StandardSchedule extends ScheduleModel {
   constructor() {
-    super(ScheduleTypeEnum.Standard, [
+    super(ScheduleTypeEnum.Standard);
+
+    this.setActivitiesForType([
       new Activity(ActivityTypeEnum.FirstHour, 7, 30, 61, 2),
       new Activity(ActivityTypeEnum.Transition, 8, 31, 5),
       new Activity(ActivityTypeEnum.SecondHour, 8, 36, 65, 2),

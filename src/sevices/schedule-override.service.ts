@@ -222,11 +222,11 @@ export class ScheduleOverrideService {
       date: new Date(2024, 8, 27),
       scheduleType: ScheduleTypeEnum.PepRally,
     },
-    {
-      // TODO: Get Pep Rally dates from Heather
-      date: new Date(2024, 8, 27),
-      scheduleType: ScheduleTypeEnum.PepRally,
-    },
+    // {
+    //   // TODO: Get Pep Rally dates from Heather
+    //   date: new Date(2024, 8, 27),
+    //   scheduleType: ScheduleTypeEnum.PepRally,
+    // },
   ];
 
   private readonly _overrides: ScheduleOverride[] = [
@@ -242,15 +242,10 @@ export class ScheduleOverrideService {
   );
 
   private getScheduleTypeForDate(date: Date): ScheduleTypeEnum {
-    return (
-      this.getOverriddenScheduleTypeForDate(date) ??
-      this.getDefaultScheduleForDayOfWeek(date)
-    );
+    return this.getOverriddenScheduleTypeForDate(date) ?? this.getDefaultScheduleForDayOfWeek(date);
   }
 
-  private getOverriddenScheduleTypeForDate(
-    date: Date
-  ): ScheduleTypeEnum | undefined {
+  private getOverriddenScheduleTypeForDate(date: Date): ScheduleTypeEnum | undefined {
     return this._overrides.find(
       (x) =>
         x.date.getDate() === date.getDate() &&

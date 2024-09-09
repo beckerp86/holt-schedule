@@ -1,13 +1,13 @@
 import { Activity } from '../../models/ActivityModel';
 import { AfterViewInit, Component, inject, Input, OnDestroy, OnInit } from '@angular/core';
+import { AudioFileEnum, AudioUtil } from '../../utils/AudioUtil';
 import { BehaviorSubject, combineLatest, debounceTime, of, repeat, Subject, takeUntil } from 'rxjs';
 import { CommonModule } from '@angular/common';
+import { NumberUtil } from '../../utils/NumberUtil';
 import { ResizeObservableService } from '../../sevices/resize-observable.service';
 import { ScheduleOverrideService } from '../../sevices/schedule-override.service';
 import { TimeService } from '../../sevices/time.service';
 import { TimeUtil } from '../../utils/TimeUtil';
-import { NumberUtil } from '../../utils/NumberUtil';
-import { AudioUtil } from '../../utils/AudioUtil';
 
 @Component({
   selector: 'app-activity',
@@ -98,7 +98,6 @@ export class ActivityComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    // TODO: Some animation would be nice here
     this.ngUnsubscribe$.next(null);
     this.ngUnsubscribe$.complete();
   }
@@ -142,7 +141,7 @@ export class ActivityComponent implements OnInit, AfterViewInit, OnDestroy {
     }
     const chimeMs = this._endMs - this.activity._warnWhenMinutesRemain * 60 * 1000;
     if (nowMs >= chimeMs) {
-      AudioUtil.playChime();
+      AudioUtil.playMp3(AudioFileEnum.Chime);
       this.playedWarningChime = true;
     }
   }
