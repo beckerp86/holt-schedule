@@ -1,6 +1,5 @@
 import { Activity } from '../../models/ActivityModel';
 import { AfterViewInit, Component, inject, Input, OnDestroy, OnInit } from '@angular/core';
-import { AudioFileEnum, AudioUtil } from '../../utils/AudioUtil';
 import { BehaviorSubject, combineLatest, debounceTime, of, repeat, Subject, takeUntil } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { NumberUtil } from '../../utils/NumberUtil';
@@ -8,6 +7,7 @@ import { ResizeObservableService } from '../../sevices/resize-observable.service
 import { ScheduleOverrideService } from '../../sevices/schedule-override.service';
 import { TimeService } from '../../sevices/time.service';
 import { TimeUtil } from '../../utils/TimeUtil';
+import { AudioFileEnum, AudioService } from '../../sevices/audio.service';
 
 @Component({
   selector: 'app-activity',
@@ -19,9 +19,14 @@ import { TimeUtil } from '../../utils/TimeUtil';
 export class ActivityComponent implements OnInit, AfterViewInit, OnDestroy {
   @Input() public activity?: Activity;
 
+  // FIXME: REMOVE AFTER TESTING
+  private _isTestingChimes = true;
+  // FIXME: REMOVE AFTER TESTING
+
   public timeService = inject(TimeService);
   public scheduleOverrideService = inject(ScheduleOverrideService);
   private resizeService = inject(ResizeObservableService);
+  private audioService = inject(AudioService);
 
   public htmlId = crypto.randomUUID();
   private _containerElement: HTMLElement | null = null;
@@ -132,6 +137,12 @@ export class ActivityComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private playWarningChime(nowMs: number): void {
+    if (this._isTestingChimes && !this.playedWarningChime) {
+      this.audioService.playMp3(AudioFileEnum.Chime);
+      this.playedWarningChime = true;
+      return;
+    }
+
     if (
       !this.activity ||
       this.playedWarningChime ||
@@ -141,7 +152,7 @@ export class ActivityComponent implements OnInit, AfterViewInit, OnDestroy {
     }
     const chimeMs = this._endMs - this.activity._warnWhenMinutesRemain * 60 * 1000;
     if (nowMs >= chimeMs) {
-      AudioUtil.playMp3(AudioFileEnum.Chime);
+      this.audioService.playMp3(AudioFileEnum.Chime);
       this.playedWarningChime = true;
     }
   }
