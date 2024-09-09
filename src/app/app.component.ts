@@ -1,4 +1,4 @@
-import { Activity, ActivityTypeEnum } from '../models/ActivityModel';
+import { Activity } from '../models/ActivityModel';
 import { ActivityComponent } from '../features/activity/activity.component';
 import { ArrayUtil } from '../utils/ArrayUtil';
 import { BehaviorSubject, distinctUntilChanged } from 'rxjs';
@@ -20,19 +20,17 @@ export class AppComponent {
   private timeService = inject(TimeService);
   private scheduleOverrideService = inject(ScheduleOverrideService);
   private activities: Activity[] = [];
-  private _isDevTesting: boolean = true;
 
   private currentActivitiesSubject = new BehaviorSubject<Activity[]>([]);
   public currentActivities$ = this.currentActivitiesSubject.asObservable().pipe(distinctUntilChanged());
 
   constructor() {
     // When date changes, fetch new day's schedule
-    this.handleDevTesting();
-    // this.scheduleOverrideService.todaySchedule$.subscribe((schedule) => {
-    //   if (schedule) {
-    //     this.activities = schedule.schedule?.activities ?? [];
-    //   }
-    // });
+    this.scheduleOverrideService.todaySchedule$.subscribe((schedule) => {
+      if (schedule) {
+        this.activities = schedule.schedule?.activities ?? [];
+      }
+    });
 
     // When minute changes, filter activities for current time
     this.timeService.currentTimeDisplay$.subscribe(() => {
@@ -51,19 +49,6 @@ export class AppComponent {
         (nowHour < x._endDate.getHours() || (nowHour === x._endDate.getHours() && nowMinute <= x._endDate.getMinutes()))
       );
     });
-    // this.currentActivitiesSubject.next(currentActivities); commented to tweak styling
-  }
-
-  private handleDevTesting(): void {
-    if (!this._isDevTesting) return;
-    const now = new Date();
-    const nowHours = now.getHours();
-    const nowMinutes = now.getMinutes();
-
-    const activity1 = new Activity(ActivityTypeEnum.FirstHour, nowHours, nowMinutes, 3, 2);
-    const activity2 = new Activity(ActivityTypeEnum.SecondHour, nowHours, nowMinutes, 2, 2);
-    const activity3 = new Activity(ActivityTypeEnum.ThirdHour, nowHours, nowMinutes, 1, 2);
-    this.activities = [activity1, activity2, activity3];
-    this.currentActivitiesSubject.next(this.activities);
+    this.currentActivitiesSubject.next(currentActivities);
   }
 }
