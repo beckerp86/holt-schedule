@@ -29,6 +29,7 @@ export class AudioService {
   }
 
   private howl(src: string): void {
+    if (!this.isAudioEnabled) return;
     const sound = new Howl({ src });
     sound.play();
   }
