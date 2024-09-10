@@ -22,14 +22,14 @@ export class AudioService {
     this._isAudioEnabledByUser = !this._isAudioEnabledByUser;
   }
 
-  public async playMp3Async(audioFileEnum: AudioFileEnum): Promise<void> {
+  public async playWavFileAsync(audioFileEnum: AudioFileEnum): Promise<void> {
     if (!this.isAudioEnabled) return;
 
     if (!this._audioContext) {
       this._audioContext = new window.AudioContext();
     }
 
-    const response = await fetch(this.getFilepath(audioFileEnum), { headers: { 'Content-Type': 'audio/mpeg3' } });
+    const response = await fetch(this.getFilepath(audioFileEnum), { headers: { 'Content-Type': 'audio/wav' } });
     const buffer = await this._audioContext.decodeAudioData(await response.arrayBuffer());
     if (this._sourceNode) {
       this._sourceNode.stop();
@@ -42,7 +42,7 @@ export class AudioService {
   }
 
   private getFilepath(audioFileEnum: AudioFileEnum): string {
-    return `${this.environmentService.assetsPath}/${audioFileEnum.toString()}.mp3`;
+    return `${this.environmentService.assetsPath}/${audioFileEnum.toString()}.wav`;
   }
 }
 

@@ -154,7 +154,7 @@ export class ActivityComponent implements OnInit, AfterViewInit, OnDestroy {
     }
     const chimeMs = this._endMs - this.activity._warnWhenMinutesRemain * 60 * 1000;
     if (nowMs >= chimeMs) {
-      await this.audioService.playMp3Async(AudioFileEnum.Chime);
+      await this.audioService.playWavFileAsync(AudioFileEnum.Chime);
       this.playedWarningChime = true;
       this.makeTimerJump();
     }
