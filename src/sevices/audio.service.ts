@@ -26,7 +26,7 @@ export class AudioService {
     if (!this.isAudioEnabled) return;
 
     if (!this._audioContext) {
-      this._audioContext = new AudioContext();
+      this._audioContext = new window.AudioContext();
     }
 
     const response = await fetch(this.getFilepath(audioFileEnum), { headers: { 'Content-Type': 'audio/mpeg3' } });
