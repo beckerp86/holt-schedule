@@ -1,17 +1,7 @@
 import { Activity } from '../../models/ActivityModel';
-import {
-  AfterViewInit,
-  Component,
-  ElementRef,
-  inject,
-  Input,
-  OnDestroy,
-  OnInit,
-  ViewChild,
-  ViewChildren,
-} from '@angular/core';
-import { AudioFileEnum, AudioService } from '../../sevices/audio.service';
-import { BehaviorSubject, combineLatest, debounceTime, of, repeat, Subject, takeUntil } from 'rxjs';
+import { AfterViewInit, Component, ElementRef, inject, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { AudioService } from '../../sevices/audio.service';
+import { BehaviorSubject, combineLatest, debounceTime, Subject, takeUntil } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { NumberUtil } from '../../utils/NumberUtil';
 import { ResizeObservableService } from '../../sevices/resize-observable.service';
@@ -59,32 +49,7 @@ export class ActivityComponent implements OnInit, AfterViewInit, OnDestroy {
   public progressBarContainerPixelWidth$ = this.progressBarContainerPixelWidthSubject.asObservable();
 
   constructor() {
-    // updates percent complete observable
-    of(null)
-      .pipe(repeat({ delay: 1000 }), takeUntil(this.ngUnsubscribe$))
-      .subscribe(() => {
-        const nowMs = new Date().getTime();
-        this.updatePercentComplete(nowMs);
-        this.updateCountdownDisplay();
-        this.playWarningChime(nowMs);
-      });
-
-    // updates progress bar width observable
-    combineLatest([this.percentComplete$, this.progressBarContainerPixelWidth$])
-      .pipe(debounceTime(100), takeUntil(this.ngUnsubscribe$))
-      .subscribe(([percentComplete, progressBarContainerPixelWidth]) => {
-        if (
-          Number.isNaN(percentComplete) ||
-          !Number.isFinite(percentComplete) ||
-          Number.isNaN(progressBarContainerPixelWidth) ||
-          !Number.isFinite(progressBarContainerPixelWidth)
-        ) {
-          return;
-        }
-        this.isComplete = percentComplete >= 1;
-        const nextWidth = Math.floor(percentComplete * progressBarContainerPixelWidth);
-        this.progressBarCurrentPixelWidthSubject.next(nextWidth);
-      });
+    this.initSubscriptions();
   }
 
   ngOnInit(): void {
@@ -115,14 +80,14 @@ export class ActivityComponent implements OnInit, AfterViewInit, OnDestroy {
     this.ngUnsubscribe$.complete();
   }
 
-  private updatePercentComplete(nowMs: number): void {
+  private async updatePercentComplete(nowMs: number): Promise<void> {
     let percentComplete = (nowMs - this._startMs) / (this._endMs - this._startMs);
     percentComplete > 1 ? 1 : percentComplete; // cap percent complete at 100%
 
     this.percentCompleteSubject.next(percentComplete);
   }
 
-  private updateCountdownDisplay(): void {
+  private async updateCountdownDisplay(): Promise<void> {
     if (!this.activity) {
       return;
     }
@@ -154,13 +119,45 @@ export class ActivityComponent implements OnInit, AfterViewInit, OnDestroy {
     }
     const chimeMs = this._endMs - this.activity._warnWhenMinutesRemain * 60 * 1000;
     if (nowMs >= chimeMs) {
-      await this.audioService.playWavFileAsync(AudioFileEnum.Chime);
-      this.playedWarningChime = true;
       this.makeTimerJump();
+      this.playedWarningChime = true;
+      this.soundTheAlarm();
     }
   }
 
   private makeTimerJump(): void {
     this.timerIcon.nativeElement.classList.add('jump-shake');
+  }
+
+  private soundTheAlarm(): void {
+    this.audioService.howlChime();
+    // this.audioService.howlSeatbelt();
+  }
+
+  private async initSubscriptions(): Promise<void> {
+    // updates percent complete observable
+    this.timeService.currentDateTime$.pipe(takeUntil(this.ngUnsubscribe$)).subscribe(async (now: Date) => {
+      const nowMs = now.getTime();
+      await this.updatePercentComplete(nowMs);
+      await this.updateCountdownDisplay();
+      await this.playWarningChime(nowMs);
+    });
+
+    // updates progress bar width observable
+    combineLatest([this.percentComplete$, this.progressBarContainerPixelWidth$])
+      .pipe(debounceTime(100), takeUntil(this.ngUnsubscribe$))
+      .subscribe(([percentComplete, progressBarContainerPixelWidth]) => {
+        if (
+          Number.isNaN(percentComplete) ||
+          !Number.isFinite(percentComplete) ||
+          Number.isNaN(progressBarContainerPixelWidth) ||
+          !Number.isFinite(progressBarContainerPixelWidth)
+        ) {
+          return;
+        }
+        this.isComplete = percentComplete >= 1;
+        const nextWidth = Math.floor(percentComplete * progressBarContainerPixelWidth);
+        this.progressBarCurrentPixelWidthSubject.next(nextWidth);
+      });
   }
 }

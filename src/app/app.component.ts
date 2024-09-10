@@ -1,12 +1,13 @@
 import { Activity, ActivityTypeEnum } from '../models/ActivityModel';
 import { ActivityComponent } from '../features/activity/activity.component';
 import { ArrayUtil } from '../utils/ArrayUtil';
-import { BehaviorSubject, distinctUntilChanged, of, repeat } from 'rxjs';
+import { BehaviorSubject, distinctUntilChanged } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { Component, inject } from '@angular/core';
 import { HeaderComponent } from '../features/header/header.component';
 import { RouterOutlet } from '@angular/router';
 import { ScheduleOverrideService } from '../sevices/schedule-override.service';
+import { TimeService } from '../sevices/time.service';
 
 @Component({
   selector: 'app-root',
@@ -17,14 +18,24 @@ import { ScheduleOverrideService } from '../sevices/schedule-override.service';
 })
 export class AppComponent {
   private scheduleOverrideService = inject(ScheduleOverrideService);
+  private timeService = inject(TimeService);
 
   private activities: Activity[] = [];
-  private _isDevTesting: boolean = false;
+
+  private readonly _isDevTesting: boolean = false; // FIXME: Remove when done testing
+  private readonly _animationTimeMs = 2000;
 
   private currentActivitiesSubject = new BehaviorSubject<Activity[]>([]);
   public currentActivities$ = this.currentActivitiesSubject.asObservable().pipe(distinctUntilChanged());
 
   constructor() {
+    // Every second, check to make sure only the active activities are displayed
+    this.timeService.currentDateTime$.subscribe((now: Date) => {
+      if (ArrayUtil.IsArrayAndHasItems(this.activities)) {
+        this.updateCurrentActivities(now);
+      }
+    });
+
     if (this._isDevTesting) {
       this.handleDevTesting();
       return;
@@ -35,26 +46,14 @@ export class AppComponent {
         this.activities = schedule.schedule?.activities ?? [];
       }
     });
-
-    // Every second, check to make sure only the active activities are displayed
-    of(null)
-      .pipe(repeat({ delay: 1000 }))
-      .subscribe(() => {
-        if (ArrayUtil.IsArrayAndHasItems(this.activities)) {
-          this.updateCurrentActivities();
-        }
-      });
   }
 
-  private updateCurrentActivities(): void {
-    const nowHour = new Date().getHours();
-    const nowMinute = new Date().getMinutes();
-    const currentActivities = this.activities.filter((x: Activity) => {
-      return (
-        (nowHour > x._startHour || (nowHour === x._startHour && nowMinute >= x._startMinute)) &&
-        (nowHour < x._endDate.getHours() || (nowHour === x._endDate.getHours() && nowMinute <= x._endDate.getMinutes()))
-      );
-    });
+  private updateCurrentActivities(now: Date): void {
+    const nowMs = now.getTime();
+    const animationEndMs = nowMs - this._animationTimeMs;
+    const currentActivities = this.activities.filter(
+      (x: Activity) => nowMs >= x._startDate.getTime() && animationEndMs <= x._endDate.getTime()
+    );
     this.currentActivitiesSubject.next(currentActivities);
   }
 
@@ -64,10 +63,10 @@ export class AppComponent {
     const nowHours = now.getHours();
     const nowMinutes = now.getMinutes();
 
-    const activity1 = new Activity(ActivityTypeEnum.FirstHour, nowHours, nowMinutes, 3, 2);
-    const activity2 = new Activity(ActivityTypeEnum.SecondHour, nowHours, nowMinutes, 2, 1);
+    const activity1 = new Activity(ActivityTypeEnum.FirstHour, nowHours, nowMinutes, 4, 2);
+    const activity2 = new Activity(ActivityTypeEnum.SecondHour, nowHours, nowMinutes, 3, 2);
     const activity3 = new Activity(ActivityTypeEnum.Transition, nowHours, nowMinutes, 1);
-    this.activities = [activity1, activity2, activity3];
+    this.activities = [activity3, activity2, activity1];
     this.currentActivitiesSubject.next(this.activities);
   }
 }

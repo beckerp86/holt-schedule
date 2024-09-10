@@ -1,6 +1,14 @@
 import TimeDuration from '../models/TimeDurationModel';
 
 export abstract class TimeUtil {
+  public static isBefore(prev: Date, next: Date): boolean {
+    return prev.getTime() < next.getTime();
+  }
+
+  public static isAfter(prev: Date, next: Date): boolean {
+    return prev.getTime() > next.getTime();
+  }
+
   public static isMinuteChanged(prev: Date, next: Date): boolean {
     return prev.getMinutes() !== next.getMinutes();
   }

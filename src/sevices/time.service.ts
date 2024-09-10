@@ -14,7 +14,7 @@ export class TimeService {
   public currentDateDisplay$ = this._currentDateDisplaySubject.asObservable();
 
   private _currentDateSubject = new BehaviorSubject<Date>(new Date());
-  public currentDate$ = this._currentDateSubject.asObservable();
+  public currentDateTime$ = this._currentDateSubject.asObservable();
 
   private _dateChangeSubject = new BehaviorSubject<Date>(new Date());
   public dateChange$ = this._dateChangeSubject.asObservable();
@@ -33,7 +33,7 @@ export class TimeService {
       });
 
     // When the date observable changes, we may need to update the Date or Time display
-    this.currentDate$.pipe(pairwise()).subscribe(([prev, next]: Date[]) => {
+    this.currentDateTime$.pipe(pairwise()).subscribe(([prev, next]: Date[]) => {
       if (TimeUtil.isMinuteChanged(prev, next)) {
         this.setNewTimeDisplay(next); // Minute changed, we need to update the display
         if (DateUtil.isDateChanged(prev, next)) {

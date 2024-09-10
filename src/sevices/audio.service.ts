@@ -1,14 +1,12 @@
+import { EnvironmentService } from '../sevices/environment.service';
+import { Howl } from 'howler';
 import { Injectable } from '@angular/core';
 import { inject } from '@angular/core';
-import { EnvironmentService } from '../sevices/environment.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AudioService {
-  private _audioContext?: AudioContext;
-  private _sourceNode?: AudioBufferSourceNode;
-
   constructor() {}
 
   private environmentService = inject(EnvironmentService);
@@ -22,30 +20,31 @@ export class AudioService {
     this._isAudioEnabledByUser = !this._isAudioEnabledByUser;
   }
 
-  public async playWavFileAsync(audioFileEnum: AudioFileEnum): Promise<void> {
-    if (!this.isAudioEnabled) return;
-
-    if (!this._audioContext) {
-      this._audioContext = new window.AudioContext();
-    }
-
-    const response = await fetch(this.getFilepath(audioFileEnum), { headers: { 'Content-Type': 'audio/wav' } });
-    const buffer = await this._audioContext.decodeAudioData(await response.arrayBuffer());
-    if (this._sourceNode) {
-      this._sourceNode.stop();
-    }
-    this._sourceNode = this._audioContext.createBufferSource();
-    this._sourceNode.buffer = buffer;
-    this._sourceNode.connect(this._audioContext.destination);
-    this._sourceNode.loop = false;
-    this._sourceNode.start();
+  public howlSeatbelt(): void {
+    this.howl(this.getFilepath(AudioFileEnum.Seatbelt, AudioFileFormat.Mp3));
   }
 
-  private getFilepath(audioFileEnum: AudioFileEnum): string {
-    return `${this.environmentService.assetsPath}/${audioFileEnum.toString()}.wav`;
+  public howlChime(): void {
+    this.howl(this.getFilepath(AudioFileEnum.Chime, AudioFileFormat.Wav));
+  }
+
+  private howl(src: string): void {
+    const sound = new Howl({ src });
+    sound.play();
+  }
+
+  private getFilepath(audioFileEnum: AudioFileEnum, audioFileFormat: AudioFileFormat): string {
+    return `${this.environmentService.assetsPath}/${audioFileEnum.toString()}.${audioFileFormat.toString()}`;
   }
 }
 
 export enum AudioFileEnum {
   Chime = 'chime',
+  Seatbelt = 'seatbelt',
+}
+
+export enum AudioFileFormat {
+  Wav = 'wav',
+  Mp3 = 'mp3',
+  Ogg = 'ogg',
 }
