@@ -66,7 +66,8 @@ export class AppComponent {
 
     const activity1 = new Activity(ActivityTypeEnum.FirstHour, nowHours, nowMinutes, 3, 2);
     const activity2 = new Activity(ActivityTypeEnum.SecondHour, nowHours, nowMinutes, 2, 1);
-    this.activities = [activity1, activity2];
+    const activity3 = new Activity(ActivityTypeEnum.Transition, nowHours, nowMinutes, 1);
+    this.activities = [activity1, activity2, activity3];
     this.currentActivitiesSubject.next(this.activities);
   }
 }

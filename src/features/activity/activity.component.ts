@@ -1,5 +1,15 @@
 import { Activity } from '../../models/ActivityModel';
-import { AfterViewInit, Component, inject, Input, OnDestroy, OnInit } from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  ElementRef,
+  inject,
+  Input,
+  OnDestroy,
+  OnInit,
+  ViewChild,
+  ViewChildren,
+} from '@angular/core';
 import { AudioFileEnum, AudioService } from '../../sevices/audio.service';
 import { BehaviorSubject, combineLatest, debounceTime, of, repeat, Subject, takeUntil } from 'rxjs';
 import { CommonModule } from '@angular/common';
@@ -18,6 +28,8 @@ import { TimeUtil } from '../../utils/TimeUtil';
 })
 export class ActivityComponent implements OnInit, AfterViewInit, OnDestroy {
   @Input() public activity?: Activity;
+
+  @ViewChild('timerIcon', { static: false }) public timerIcon!: ElementRef;
 
   public timeService = inject(TimeService);
   public scheduleOverrideService = inject(ScheduleOverrideService);
@@ -144,6 +156,11 @@ export class ActivityComponent implements OnInit, AfterViewInit, OnDestroy {
     if (nowMs >= chimeMs) {
       await this.audioService.playMp3Async(AudioFileEnum.Chime);
       this.playedWarningChime = true;
+      this.makeTimerJump();
     }
+  }
+
+  private makeTimerJump(): void {
+    this.timerIcon.nativeElement.classList.add('jump-shake');
   }
 }

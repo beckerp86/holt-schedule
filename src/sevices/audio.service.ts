@@ -6,7 +6,7 @@ import { EnvironmentService } from '../sevices/environment.service';
   providedIn: 'root',
 })
 export class AudioService {
-  private readonly _audioContext: AudioContext = new AudioContext();
+  private _audioContext?: AudioContext;
   private _sourceNode?: AudioBufferSourceNode;
 
   constructor() {}
@@ -24,16 +24,13 @@ export class AudioService {
 
   public async playMp3Async(audioFileEnum: AudioFileEnum): Promise<void> {
     if (!this.isAudioEnabled) return;
+
+    if (!this._audioContext) {
+      this._audioContext = new AudioContext();
+    }
+
     const response = await fetch(this.getFilepath(audioFileEnum), { headers: { 'Content-Type': 'audio/mpeg3' } });
     const buffer = await this._audioContext.decodeAudioData(await response.arrayBuffer());
-    this.playFromBuffer(buffer);
-  }
-
-  private getFilepath(audioFileEnum: AudioFileEnum): string {
-    return `${this.environmentService.assetsPath}/${audioFileEnum.toString()}.mp3`;
-  }
-
-  private playFromBuffer(buffer: AudioBuffer): void {
     if (this._sourceNode) {
       this._sourceNode.stop();
     }
@@ -42,6 +39,10 @@ export class AudioService {
     this._sourceNode.connect(this._audioContext.destination);
     this._sourceNode.loop = false;
     this._sourceNode.start();
+  }
+
+  private getFilepath(audioFileEnum: AudioFileEnum): string {
+    return `${this.environmentService.assetsPath}/${audioFileEnum.toString()}.mp3`;
   }
 }
 
