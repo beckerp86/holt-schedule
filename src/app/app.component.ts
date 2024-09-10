@@ -19,7 +19,7 @@ export class AppComponent {
   private scheduleOverrideService = inject(ScheduleOverrideService);
 
   private activities: Activity[] = [];
-  private _isDevTesting: boolean = true;
+  private _isDevTesting: boolean = false;
 
   private currentActivitiesSubject = new BehaviorSubject<Activity[]>([]);
   public currentActivities$ = this.currentActivitiesSubject.asObservable().pipe(distinctUntilChanged());
