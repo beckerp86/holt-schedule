@@ -1,5 +1,6 @@
 import { Activity } from '../../models/ActivityModel';
 import { AfterViewInit, Component, inject, Input, OnDestroy, OnInit } from '@angular/core';
+import { AudioFileEnum, AudioService } from '../../sevices/audio.service';
 import { BehaviorSubject, combineLatest, debounceTime, of, repeat, Subject, takeUntil } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { NumberUtil } from '../../utils/NumberUtil';
@@ -7,7 +8,6 @@ import { ResizeObservableService } from '../../sevices/resize-observable.service
 import { ScheduleOverrideService } from '../../sevices/schedule-override.service';
 import { TimeService } from '../../sevices/time.service';
 import { TimeUtil } from '../../utils/TimeUtil';
-import { AudioFileEnum, AudioService } from '../../sevices/audio.service';
 
 @Component({
   selector: 'app-activity',

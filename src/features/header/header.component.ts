@@ -1,9 +1,9 @@
+import Swal, { SweetAlertResult } from 'sweetalert2';
+import { AfterViewInit, Component, inject } from '@angular/core';
 import { AudioService } from '../../sevices/audio.service';
 import { CommonModule } from '@angular/common';
-import { AfterViewInit, Component, inject } from '@angular/core';
 import { ScheduleOverrideService } from '../../sevices/schedule-override.service';
 import { TimeService } from '../../sevices/time.service';
-import Swal, { SweetAlertResult } from 'sweetalert2';
 
 @Component({
   selector: 'app-header',

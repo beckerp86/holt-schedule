@@ -24,8 +24,22 @@
   display: flex;
   align-items: center;
   svg {
+    g {
+      fill: var(--HPS_Gold);
+    }
+    path {
+      stroke: var(--HPS_Gold);
+    }
     margin-left: 6px;
     width: 24px;
     height: 24px;
+  }
+  &:hover {
+    svg > g > g {
+      fill: var(--HPS_Brown);
+    }
+    svg > path {
+      stroke: var(--HPS_Brown);
+    }
   }
 }
