@@ -24,7 +24,7 @@ export class AudioService {
 
   public async playMp3Async(audioFileEnum: AudioFileEnum): Promise<void> {
     if (!this.isAudioEnabled) return;
-    const response = await fetch(this.getFilepath(audioFileEnum), { headers: { 'Content-Type': 'audio/mpeg' } });
+    const response = await fetch(this.getFilepath(audioFileEnum), { headers: { 'Content-Type': 'audio/mpeg3' } });
     const buffer = await this._audioContext.decodeAudioData(await response.arrayBuffer());
     this.playFromBuffer(buffer);
   }
