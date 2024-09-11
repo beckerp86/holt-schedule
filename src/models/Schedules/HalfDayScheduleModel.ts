@@ -35,6 +35,8 @@ export class HalfDaySchedule extends ScheduleModel {
           new Activity(ActivityTypeEnum.SecondHour, 8, 45, 70, 2),
           new Activity(ActivityTypeEnum.Transition, 9, 55, 5),
           new Activity(ActivityTypeEnum.ThirdHour, 10, 0, 70, 2),
+          new Activity(ActivityTypeEnum.PTC_Lunch, 11, 10, 80, 2),
+          new Activity(ActivityTypeEnum.PTC_Conferences, 12, 30, 180),
         ];
       case ScheduleTypeEnum.HalfDay4Through6:
         return [
@@ -43,6 +45,8 @@ export class HalfDaySchedule extends ScheduleModel {
           new Activity(ActivityTypeEnum.FifthHour, 8, 45, 70, 2),
           new Activity(ActivityTypeEnum.Transition, 9, 55, 5),
           new Activity(ActivityTypeEnum.SixthHour, 10, 0, 70, 2),
+          new Activity(ActivityTypeEnum.PTC_Lunch, 11, 10, 80, 2),
+          new Activity(ActivityTypeEnum.PTC_Conferences, 12, 30, 180),
         ];
       default:
         throw new Error('Invalid half day type');

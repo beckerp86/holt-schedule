@@ -67,6 +67,12 @@ export class Activity {
         return 'Ram Time';
       case ActivityTypeEnum.PD:
         return 'PD';
+      case ActivityTypeEnum.PTC_Lunch:
+        return 'Lunch Break';
+      case ActivityTypeEnum.PTC_Conferences:
+        return 'Conferences';
+      case ActivityTypeEnum.MorningPlanning:
+        return 'Morning Planning';
     }
   }
 }
@@ -88,4 +94,7 @@ export enum ActivityTypeEnum {
   PepRally,
   RamTime,
   PD,
+  PTC_Lunch,
+  PTC_Conferences,
+  MorningPlanning,
 }
