@@ -1,5 +1,5 @@
 export enum ScheduleTypeEnum {
-    NoSchool = 0,
+    NoSchool = 1,
     EarlyRelease,
     HalfDay1And2,
     HalfDay1Through3,

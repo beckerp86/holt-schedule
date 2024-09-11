@@ -9,6 +9,7 @@ import { map, Observable } from 'rxjs';
 })
 export class ScheduleOverrideService {
   constructor() {}
+
   private timeService = inject(TimeService);
 
   private readonly _noSchoolOverrides: IScheduleOverride[] = [
