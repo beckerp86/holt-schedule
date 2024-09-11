@@ -27,7 +27,11 @@ export class EarlyReleaseSchedule extends ScheduleModel {
       new Activity(ActivityTypeEnum.BLunch, 11, 21, 25),
 
       new Activity(ActivityTypeEnum.Transition, 11, 46, 5),
-      new Activity(ActivityTypeEnum.SixthHour, 11, 51, 41, 2),
+      new Activity(ActivityTypeEnum.SixthHour, 11, 51, 44, 2),
+      // Kids are released at 12:35
+
+      new Activity(ActivityTypeEnum.Transition, 12, 35, 10),
+      new Activity(ActivityTypeEnum.PD, 12, 45, 110),
     ]);
   }
 }
