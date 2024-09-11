@@ -1,0 +1,18 @@
+.footer-container {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 13vh;
+
+  .footer {
+    display: flex;
+    flex: 1 1 auto;
+    align-items: flex-end;
+    justify-content: space-around;
+    font-size: larger;
+    font-weight: 700;
+  }
+}

@@ -24,20 +24,24 @@ export abstract class DateUtil {
     return dateDisplay;
   }
 
+  public static getNumberOfDaysBetweenDates(startDate: Date, endDate: Date): number {
+    startDate.setHours(0, 0, 0, 0);
+    endDate.setHours(0, 0, 0, 0);
+    let startDateMs = startDate.getTime();
+    let endDateMs = endDate.getTime();
+    if (startDate >= endDate) {
+      return 0; // The end date is actually before the start date
+    }
+
+    return Math.floor((endDateMs - startDateMs) / (1000 * 60 * 60 * 24));
+  }
+
   private static getDayOfMonthDisplay(date: Date): string {
     return date.getDate().toString();
   }
 
   private static getDayOfWeekDisplay(date: Date): string {
-    const weekdays = [
-      'Sunday',
-      'Monday',
-      'Tuesday',
-      'Wednesday',
-      'Thursday',
-      'Friday',
-      'Saturday',
-    ];
+    const weekdays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
     const dayOfWeekIndex: number = date.getDay();
     return weekdays[dayOfWeekIndex];
   }

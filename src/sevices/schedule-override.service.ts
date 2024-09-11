@@ -11,7 +11,7 @@ export class ScheduleOverrideService {
   constructor() {}
   private timeService = inject(TimeService);
 
-  private readonly _noSchoolOverrides: ScheduleOverride[] = [
+  private readonly _noSchoolOverrides: IScheduleOverride[] = [
     {
       date: new Date(2024, 9, 14),
       scheduleType: ScheduleTypeEnum.NoSchool,
@@ -164,7 +164,7 @@ export class ScheduleOverrideService {
     },
   ];
 
-  private readonly _halfDayOverrides: ScheduleOverride[] = [
+  private readonly _halfDayOverrides: IScheduleOverride[] = [
     {
       date: new Date(2024, 8, 26),
       scheduleType: ScheduleTypeEnum.HalfDay1Through3,
@@ -217,7 +217,7 @@ export class ScheduleOverrideService {
     },
   ];
 
-  private readonly _pepRallyOverrides: ScheduleOverride[] = [
+  private readonly _pepRallyOverrides: IScheduleOverride[] = [
     {
       date: new Date(2024, 8, 27),
       scheduleType: ScheduleTypeEnum.PepRally,
@@ -229,7 +229,7 @@ export class ScheduleOverrideService {
     // },
   ];
 
-  private readonly _earlyReleaseWednesdayOverrides: ScheduleOverride[] = [
+  private readonly _earlyReleaseWednesdayOverrides: IScheduleOverride[] = [
     {
       date: new Date(2024, 8, 11),
       scheduleType: ScheduleTypeEnum.EarlyRelease,
@@ -304,7 +304,7 @@ export class ScheduleOverrideService {
     },
   ];
 
-  private readonly _overrides: ScheduleOverride[] = [
+  private readonly _overrides: IScheduleOverride[] = [
     ...this._noSchoolOverrides,
     ...this._halfDayOverrides,
     ...this._pepRallyOverrides,
@@ -314,6 +314,25 @@ export class ScheduleOverrideService {
   todaySchedule$: Observable<DailySchedule> = this.timeService.dateChange$.pipe(
     map((date: Date) => {
       return new DailySchedule(this.getScheduleTypeForDate(date));
+    })
+  );
+
+  /**
+   * Returns null when the next schedule could not be resolved within the next 30 days.
+   * SUMMER BREAK!
+   * @type {(Observable<INextSchedule | null>)}
+   */
+  nextSchedule$: Observable<INextSchedule | null> = this.timeService.dateChange$.pipe(
+    map((date: Date) => {
+      // Check each day for the next 30 days to find the next school day.
+      for (let i = 0; i < 30; i++) {
+        date.setDate(date.getDate() + 1);
+        const schedule = new DailySchedule(this.getScheduleTypeForDate(date));
+        if (schedule.schedule?.type !== ScheduleTypeEnum.NoSchool) {
+          return { date, schedule };
+        }
+      }
+      return null;
     })
   );
 
@@ -349,8 +368,13 @@ export class ScheduleOverrideService {
   }
 }
 
-interface ScheduleOverride {
+export interface IScheduleOverride {
   date: Date;
   scheduleType: ScheduleTypeEnum;
   reason?: string;
+}
+
+export interface INextSchedule {
+  date: Date;
+  schedule: DailySchedule;
 }

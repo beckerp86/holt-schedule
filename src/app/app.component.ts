@@ -4,6 +4,7 @@ import { ArrayUtil } from '../utils/ArrayUtil';
 import { BehaviorSubject, distinctUntilChanged } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { Component, inject } from '@angular/core';
+import { FooterComponent } from '../features/footer/footer.component';
 import { HeaderComponent } from '../features/header/header.component';
 import { RouterOutlet } from '@angular/router';
 import { ScheduleOverrideService } from '../sevices/schedule-override.service';
@@ -12,7 +13,7 @@ import { TimeService } from '../sevices/time.service';
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, CommonModule, ActivityComponent, HeaderComponent],
+  imports: [RouterOutlet, CommonModule, ActivityComponent, HeaderComponent, FooterComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css',
 })
@@ -63,10 +64,12 @@ export class AppComponent {
     const nowHours = now.getHours();
     const nowMinutes = now.getMinutes();
 
-    const activity1 = new Activity(ActivityTypeEnum.FirstHour, nowHours, nowMinutes, 4, 2);
-    const activity2 = new Activity(ActivityTypeEnum.SecondHour, nowHours, nowMinutes, 3, 2);
-    const activity3 = new Activity(ActivityTypeEnum.Transition, nowHours, nowMinutes, 1);
-    this.activities = [activity3, activity2, activity1];
+    const activity1 = new Activity(ActivityTypeEnum.Transition, nowHours, nowMinutes, 1);
+    const activity2 = new Activity(ActivityTypeEnum.FirstHour, nowHours, nowMinutes, 2, 1);
+    const activity3 = new Activity(ActivityTypeEnum.SecondHour, nowHours, nowMinutes, 3, 1);
+    const activity4 = new Activity(ActivityTypeEnum.PTC_Conferences, nowHours, nowMinutes, 4, 1);
+
+    this.activities = [activity1, activity2, activity3, activity4];
     this.currentActivitiesSubject.next(this.activities);
   }
 }
