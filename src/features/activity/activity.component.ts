@@ -1,8 +1,8 @@
 import { Activity } from '../../models/ActivityModel';
 import { AfterViewInit, Component, ElementRef, inject, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { AsyncPipe, NgClass, NgIf } from '@angular/common';
 import { AudioService } from '../../sevices/audio.service';
 import { BehaviorSubject, combineLatest, debounceTime, Subject, takeUntil } from 'rxjs';
-import { CommonModule } from '@angular/common';
 import { NumberUtil } from '../../utils/NumberUtil';
 import { ResizeObservableService } from '../../sevices/resize-observable.service';
 import { ScheduleOverrideService } from '../../sevices/schedule-override.service';
@@ -12,7 +12,7 @@ import { TimeUtil } from '../../utils/TimeUtil';
 @Component({
   selector: 'app-activity',
   standalone: true,
-  imports: [CommonModule],
+  imports: [AsyncPipe, NgIf, NgClass],
   templateUrl: './activity.component.html',
   styleUrl: './activity.component.css',
 })
@@ -48,13 +48,16 @@ export class ActivityComponent implements OnInit, AfterViewInit, OnDestroy {
   private progressBarContainerPixelWidthSubject = new BehaviorSubject<number>(1920);
   public progressBarContainerPixelWidth$ = this.progressBarContainerPixelWidthSubject.asObservable();
 
+  private canLeaveClassSubject = new BehaviorSubject<boolean>(false);
+  public canLeaveClass$ = this.canLeaveClassSubject.asObservable();
+
   constructor() {
     this.initSubscriptions();
   }
 
   ngOnInit(): void {
-    this._startMs = this.activity?._startDate?.getTime() ?? 0;
-    this._endMs = this.activity?._endDate?.getTime() ?? 0;
+    this._startMs = this.activity?.startDate?.getTime() ?? 0;
+    this._endMs = this.activity?.endDate?.getTime() ?? 0;
   }
 
   ngAfterViewInit(): void {
@@ -91,7 +94,7 @@ export class ActivityComponent implements OnInit, AfterViewInit, OnDestroy {
     if (!this.activity) {
       return;
     }
-    const duration = TimeUtil.getDurationBetweenDates(new Date(), this.activity._endDate);
+    const duration = TimeUtil.getDurationBetweenDates(new Date(), this.activity.endDate);
     this.countdownDisplaySubject.next(TimeUtil.getTimerDisplay(duration));
   }
 
@@ -113,11 +116,11 @@ export class ActivityComponent implements OnInit, AfterViewInit, OnDestroy {
     if (
       !this.activity ||
       this.playedWarningChime ||
-      !NumberUtil.IsPositiveInteger(this.activity._warnWhenMinutesRemain)
+      !NumberUtil.IsPositiveInteger(this.activity.warnWhenMinutesRemain)
     ) {
       return;
     }
-    const chimeMs = this._endMs - this.activity._warnWhenMinutesRemain * 60 * 1000;
+    const chimeMs = this._endMs - this.activity.warnWhenMinutesRemain * 60 * 1000;
     if (nowMs >= chimeMs) {
       this.makeTimerJump();
       this.playedWarningChime = true;
@@ -134,6 +137,16 @@ export class ActivityComponent implements OnInit, AfterViewInit, OnDestroy {
     // this.audioService.howlSeatbelt();
   }
 
+  private updateCanLeaveClass(nowMs: number): void {
+    if (!this.activity || !this.activity.studentsWillBeAbleToLeaveClassAtSomePoint) {
+      return;
+    }
+
+    const canLeaveClassNow =
+      nowMs >= this.activity.canLeaveClassStart!.getTime() && nowMs <= this.activity.canLeaveClassEnd!.getTime();
+    this.canLeaveClassSubject.next(canLeaveClassNow);
+  }
+
   private async initSubscriptions(): Promise<void> {
     // updates percent complete observable
     this.timeService.currentDateTime$.pipe(takeUntil(this.ngUnsubscribe$)).subscribe(async (now: Date) => {
@@ -141,6 +154,7 @@ export class ActivityComponent implements OnInit, AfterViewInit, OnDestroy {
       await this.updatePercentComplete(nowMs);
       await this.updateCountdownDisplay();
       await this.playWarningChime(nowMs);
+      this.updateCanLeaveClass(nowMs);
     });
 
     // updates progress bar width observable

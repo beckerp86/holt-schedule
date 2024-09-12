@@ -42,7 +42,7 @@ export class AppComponent {
       return;
     }
     // When date changes, fetch new day's schedule
-    this.scheduleOverrideService.todaySchedule$.subscribe((schedule) => {
+    this.scheduleOverrideService.todaysSchedule$.subscribe((schedule) => {
       if (schedule) {
         this.activities = schedule.schedule?.activities ?? [];
       }
@@ -53,7 +53,7 @@ export class AppComponent {
     const nowMs = now.getTime();
     const animationEndMs = nowMs - this._animationTimeMs;
     const currentActivities = this.activities.filter(
-      (x: Activity) => nowMs >= x._startDate.getTime() && animationEndMs <= x._endDate.getTime()
+      (x: Activity) => nowMs >= x.startDate.getTime() && animationEndMs <= x.endDate.getTime()
     );
     this.currentActivitiesSubject.next(currentActivities);
   }

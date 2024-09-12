@@ -2,12 +2,33 @@ import { TimeUtil } from '../utils/TimeUtil';
 
 export class Activity {
   private readonly _type: ActivityTypeEnum;
-  readonly _startHour: number;
-  readonly _startMinute: number;
-  readonly _durationMinutes: number;
-  readonly _warnWhenMinutesRemain: number;
-  readonly _startDate: Date;
-  readonly _endDate: Date;
+  private readonly _minuteAllowanceToLeaveClass: number = 10;
+
+  private _isInstructionalTime: boolean = false;
+  private _canLeaveClassStart: Date | undefined = undefined;
+  private _canLeaveClassEnd: Date | undefined = undefined;
+  readonly startHour: number;
+  readonly startMinute: number;
+  readonly durationMinutes: number;
+  readonly warnWhenMinutesRemain: number;
+  readonly startDate: Date;
+  readonly endDate: Date;
+
+  get isInstructionalTime(): boolean {
+    return this._isInstructionalTime;
+  }
+
+  get studentsWillBeAbleToLeaveClassAtSomePoint(): boolean {
+    return this._canLeaveClassStart !== undefined && this._canLeaveClassEnd !== undefined;
+  }
+
+  get canLeaveClassStart(): Date | undefined {
+    return this._canLeaveClassStart;
+  }
+
+  get canLeaveClassEnd(): Date | undefined {
+    return this._canLeaveClassEnd;
+  }
 
   constructor(
     typeEnum: ActivityTypeEnum,
@@ -17,20 +38,24 @@ export class Activity {
     warnWhenMinutesRemain: number = 0
   ) {
     this._type = typeEnum;
-    this._startHour = startHour;
-    this._startMinute = startMinute;
-    this._durationMinutes = durationMinutes;
-    this._warnWhenMinutesRemain = warnWhenMinutesRemain;
+    this.startHour = startHour;
+    this.startMinute = startMinute;
+    this.durationMinutes = durationMinutes;
+    this.warnWhenMinutesRemain = warnWhenMinutesRemain;
 
     const startDate = new Date();
-    this._startDate = new Date(
+    this.startDate = new Date(
       startDate.getFullYear(),
       startDate.getMonth(),
       startDate.getDate(),
       startHour,
-      startMinute
+      startMinute,
+      0,
+      0
     );
-    this._endDate = TimeUtil.getEndDateForDuration(this._startDate, durationMinutes);
+    this.endDate = TimeUtil.getEndDateForDuration(this.startDate, durationMinutes);
+    this.setInstructionalTime();
+    this.setAllowedRangeToLeaveClass();
   }
 
   get typeDescription(): string {
@@ -73,6 +98,61 @@ export class Activity {
         return 'Conferences';
       case ActivityTypeEnum.MorningPlanning:
         return 'Morning Planning';
+    }
+  }
+
+  private setAllowedRangeToLeaveClass(): void {
+    if (!this.isInstructionalTime || !this.canLeaveClassIfConditionsAreMet()) {
+      return;
+    }
+
+    this._canLeaveClassStart = TimeUtil.addMinutes(this.startDate, this._minuteAllowanceToLeaveClass);
+    this._canLeaveClassEnd = TimeUtil.addMinutes(this.endDate, -this._minuteAllowanceToLeaveClass);
+  }
+
+  private setInstructionalTime(): void {
+    switch (this._type) {
+      case ActivityTypeEnum.FirstHour:
+        this._isInstructionalTime = true;
+        break;
+      case ActivityTypeEnum.SecondHour:
+        this._isInstructionalTime = true;
+        break;
+      case ActivityTypeEnum.ThirdHour:
+        this._isInstructionalTime = true;
+        break;
+      case ActivityTypeEnum.FourthHour:
+        this._isInstructionalTime = true;
+        break;
+      case ActivityTypeEnum.FifthHour:
+        this._isInstructionalTime = true;
+        break;
+      case ActivityTypeEnum.SixthHour:
+        this._isInstructionalTime = true;
+        break;
+      case ActivityTypeEnum.ALunchClass:
+        this._isInstructionalTime = true;
+        break;
+      case ActivityTypeEnum.BLunchClass:
+        this._isInstructionalTime = true;
+        break;
+      case ActivityTypeEnum.RamTime:
+        this._isInstructionalTime = true;
+        break;
+      default:
+        this._isInstructionalTime = false;
+        break;
+    }
+  }
+
+  private canLeaveClassIfConditionsAreMet(): boolean {
+    switch (this._type) {
+      case ActivityTypeEnum.ALunchClass:
+        return false;
+      case ActivityTypeEnum.BLunchClass:
+        return false;
+      default:
+        return true;
     }
   }
 }

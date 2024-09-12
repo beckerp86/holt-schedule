@@ -1,12 +1,22 @@
 <div class="activity-container" [id]="htmlId">
   <div class="activity">
-    <span class="activity-name">{{ activity?.typeDescription }}</span>
+    <span class="activity-name"
+      ><span>{{ activity?.typeDescription }} </span>
+      <span
+        *ngIf="activity?.studentsWillBeAbleToLeaveClassAtSomePoint === true"
+      >
+        <span
+          class="circle"
+          [ngClass]="(canLeaveClass$ | async) ? 'green' : 'red'"
+        ></span>
+      </span>
+    </span>
     <span class="activity-duration"
       ><span
         #timerIcon
         *ngIf="
-          activity?._warnWhenMinutesRemain !== undefined &&
-          activity?._warnWhenMinutesRemain! > 0
+          activity?.warnWhenMinutesRemain !== undefined &&
+          activity?.warnWhenMinutesRemain! > 0
         "
         ><svg
           width="100px"
@@ -67,3 +77,4 @@
     >
   </div>
 </div>
+<div matTooltip="Students cannot leave class when this indicator is red"></div>

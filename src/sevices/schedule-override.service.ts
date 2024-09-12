@@ -1,16 +1,24 @@
+import { BehaviorSubject } from 'rxjs';
 import { DailySchedule } from '../models/DailySchedule';
 import { ScheduleTypeEnum } from '../models/ScheduleTypeEnum';
 import { TimeService } from './time.service';
 import { inject, Injectable } from '@angular/core';
-import { map, Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ScheduleOverrideService {
-  constructor() {}
+  constructor() {
+    this.initSubscriptions();
+  }
 
   private timeService = inject(TimeService);
+
+  private _todaysScheduleSubject = new BehaviorSubject<DailySchedule | undefined>(undefined);
+  public todaysSchedule$ = this._todaysScheduleSubject.asObservable();
+
+  private _nextScheduleSubject = new BehaviorSubject<INextSchedule | null>(null);
+  public nextSchedule$ = this._nextScheduleSubject.asObservable();
 
   private readonly _noSchoolOverrides: IScheduleOverride[] = [
     {
@@ -312,31 +320,6 @@ export class ScheduleOverrideService {
     ...this._earlyReleaseWednesdayOverrides,
   ];
 
-  todaySchedule$: Observable<DailySchedule> = this.timeService.dateChange$.pipe(
-    map((date: Date) => {
-      return new DailySchedule(this.getScheduleTypeForDate(date));
-    })
-  );
-
-  /**
-   * Returns null when the next schedule could not be resolved within the next 30 days.
-   * SUMMER BREAK!
-   * @type {(Observable<INextSchedule | null>)}
-   */
-  nextSchedule$: Observable<INextSchedule | null> = this.timeService.dateChange$.pipe(
-    map((date: Date) => {
-      // Check each day for the next 30 days to find the next school day.
-      for (let i = 0; i < 30; i++) {
-        date.setDate(date.getDate() + 1);
-        const schedule = new DailySchedule(this.getScheduleTypeForDate(date));
-        if (schedule.schedule?.type !== ScheduleTypeEnum.NoSchool) {
-          return { date, schedule };
-        }
-      }
-      return null;
-    })
-  );
-
   private getScheduleTypeForDate(date: Date): ScheduleTypeEnum {
     return this.getOverriddenScheduleTypeForDate(date) ?? this.getDefaultScheduleForDayOfWeek(date);
   }
@@ -366,6 +349,31 @@ export class ScheduleOverrideService {
       default:
         return ScheduleTypeEnum.NoSchool;
     }
+  }
+
+  private setTodaysSchedule(): void {
+    const todaysSchedule = new DailySchedule(this.getScheduleTypeForDate(new Date()));
+    this._todaysScheduleSubject.next(todaysSchedule);
+  }
+
+  private setNextSchedule(): void {
+    let date = new Date();
+    for (let i = 0; i < 30; i++) {
+      date.setDate(date.getDate() + 1);
+      const schedule = new DailySchedule(this.getScheduleTypeForDate(date));
+      if (schedule.schedule?.type !== ScheduleTypeEnum.NoSchool) {
+        this._nextScheduleSubject.next({ date, schedule });
+        return;
+      }
+    }
+    this._nextScheduleSubject.next(null);
+  }
+
+  private initSubscriptions(): void {
+    this.timeService.dateChange$.subscribe(() => {
+      this.setTodaysSchedule();
+      this.setNextSchedule();
+    });
   }
 }
 

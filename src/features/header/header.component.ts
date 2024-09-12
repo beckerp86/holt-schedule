@@ -38,7 +38,6 @@ export class HeaderComponent implements AfterViewInit {
       if (result.isConfirmed) {
         Swal.fire({
           title: 'Audio Enabled!',
-          text: 'LET THE CHIMES BEGIN!',
           showConfirmButton: false,
           icon: 'success',
           timer: 2000,
@@ -46,7 +45,6 @@ export class HeaderComponent implements AfterViewInit {
       } else {
         Swal.fire({
           title: 'Audio Disabled!',
-          text: 'NO CHIMES! I HATE CHIMES!',
           showConfirmButton: false,
           icon: 'success',
           timer: 2000,

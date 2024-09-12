@@ -1,8 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject } from '@angular/core';
-import { INextSchedule, ScheduleOverrideService } from '../../sevices/schedule-override.service';
-import { TimeUtil } from '../../utils/TimeUtil';
 import { DateUtil } from '../../utils/DateUtil';
+import { INextSchedule, ScheduleOverrideService } from '../../sevices/schedule-override.service';
 
 @Component({
   selector: 'app-footer',

@@ -2,7 +2,7 @@
   <span class="date">{{ timeService.currentDateDisplay$ | async }}</span>
   <span class="time">{{ timeService.currentTimeDisplay$ | async }}</span>
   <span class="schedule-type">{{
-    (scheduleOverrideService.todaySchedule$ | async)?.scheduleDescription
+    (scheduleOverrideService.todaysSchedule$ | async)?.scheduleDescription
   }}</span>
   <button
     *ngIf="!isAudioEnabled"

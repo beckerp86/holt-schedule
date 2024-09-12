@@ -9,6 +9,10 @@ export abstract class TimeUtil {
     return prev.getTime() > next.getTime();
   }
 
+  public static addMinutes(date: Date, minutes: number): Date {
+    return new Date(date.getTime() + minutes * 60000);
+  }
+
   public static isMinuteChanged(prev: Date, next: Date): boolean {
     return prev.getMinutes() !== next.getMinutes();
   }

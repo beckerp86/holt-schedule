@@ -30,6 +30,25 @@
     font-weight: 700;
     font-size: 10vh;
 
+    .activity-name {
+      display: flex;
+      align-items: center;
+
+      .circle {
+        margin-left: 20px;
+        display: flex;
+        height: 8vh;
+        width: 8vh;
+        border: 1px solid transparent;
+        border-radius: 50%;
+      }
+      .circle.green {
+        background-color: green;
+      }
+      .circle.red {
+        background-color: red;
+      }
+    }
     .activity-duration {
       display: flex;
       align-items: center;
