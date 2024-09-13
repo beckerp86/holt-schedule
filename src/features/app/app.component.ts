@@ -32,7 +32,7 @@ export class AppComponent {
 
   private activities: Activity[] = [];
 
-  private readonly _isDevTesting: boolean = true; // FIXME: Remove when done testing
+  private readonly _isDevTesting: boolean = false; // FIXME: Remove when done testing
   private readonly _animationTimeMs = 2000;
 
   private currentActivitiesSubject = new BehaviorSubject<Activity[]>([]);
