@@ -9,13 +9,21 @@ export class LocalStorageService {
     return localStorage.getItem(LocalStorageKeys.IsDevMode) === 'true';
   }
 
-  setNewDevModeState(isDevModeEnabled: boolean): void {
-    localStorage.setItem(LocalStorageKeys.IsDevMode, `${isDevModeEnabled}`);
-  }
-
   get devModeEmulatedDateTime(): Date | undefined {
     const devModeEmulatedDateTime = localStorage.getItem(LocalStorageKeys.DevModeEmulatedDateTime);
     return !devModeEmulatedDateTime ? undefined : new Date(devModeEmulatedDateTime);
+  }
+
+  get isAudioEnabled(): boolean {
+    return localStorage.getItem(LocalStorageKeys.IsAudioEnabled) === 'true';
+  }
+
+  setAudioEnabledStatus(newvalue: boolean): void {
+    localStorage.setItem(LocalStorageKeys.IsAudioEnabled, `${newvalue}`);
+  }
+
+  setNewDevModeState(isDevModeEnabled: boolean): void {
+    localStorage.setItem(LocalStorageKeys.IsDevMode, `${isDevModeEnabled}`);
   }
 
   setNewDevModeEmulatedDateTime(date: Date | undefined): void {
@@ -28,4 +36,5 @@ export class LocalStorageService {
 export enum LocalStorageKeys {
   IsDevMode = 'IsDevMode',
   DevModeEmulatedDateTime = 'DevModeEmulatedDateTime',
+  IsAudioEnabled = 'IsAudioEnabled',
 }

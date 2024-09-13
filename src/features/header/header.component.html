@@ -14,10 +14,10 @@
     play audio
   </button>
   <button
-    *ngIf="!isAudioEnabled"
+    *ngIf="!localStorageService.isAudioEnabled"
     id="enable-alerts-btn"
     class="button alert-toggle-btn"
-    (click)="toggleAudio()"
+    (click)="localStorageService.setAudioEnabledStatus(true)"
   >
     Audio Alerts Disabled
     <svg
@@ -37,10 +37,10 @@
     </svg>
   </button>
   <button
-    *ngIf="isAudioEnabled"
+    *ngIf="localStorageService.isAudioEnabled"
     id="disable-alerts-btn"
     class="button alert-toggle-btn"
-    (click)="toggleAudio()"
+    (click)="localStorageService.setAudioEnabledStatus(false)"
   >
     Audio Alerts Enabled
     <svg

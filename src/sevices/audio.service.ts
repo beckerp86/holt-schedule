@@ -1,24 +1,15 @@
 import { EnvironmentService } from '../sevices/environment.service';
 import { Howl } from 'howler';
 import { Injectable } from '@angular/core';
+import { LocalStorageService } from './local-storage.service';
 import { inject } from '@angular/core';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AudioService {
-  constructor() {}
-
   private environmentService = inject(EnvironmentService);
-  private _isAudioEnabledByUser = false;
-
-  get isAudioEnabled(): boolean {
-    return this._isAudioEnabledByUser;
-  }
-
-  public toggleAudio(): void {
-    this._isAudioEnabledByUser = !this._isAudioEnabledByUser;
-  }
+  private localStorageService = inject(LocalStorageService);
 
   public howlSeatbelt(): void {
     this.howl(this.getFilepath(AudioFileEnum.Seatbelt, AudioFileFormat.Mp3));
@@ -29,7 +20,7 @@ export class AudioService {
   }
 
   private howl(src: string): void {
-    if (!this.isAudioEnabled) return;
+    if (!this.localStorageService.isAudioEnabled) return;
     try {
       const sound = new Howl({ src });
       sound.play();
