@@ -2,6 +2,7 @@ import Swal, { SweetAlertResult } from 'sweetalert2';
 import { AfterViewInit, Component, inject } from '@angular/core';
 import { AudioService } from '../../sevices/audio.service';
 import { CommonModule } from '@angular/common';
+import { LocalStorageService } from '../../sevices/local-storage.service';
 import { ScheduleService } from '../../sevices/schedule.service';
 import { TimeService } from '../../sevices/time.service';
 
@@ -14,9 +15,11 @@ import { TimeService } from '../../sevices/time.service';
 })
 export class HeaderComponent implements AfterViewInit {
   constructor() {}
+  private audioService = inject(AudioService);
+  public localStorageService = inject(LocalStorageService);
+
   public timeService = inject(TimeService);
   public scheduleService = inject(ScheduleService);
-  private audioService = inject(AudioService);
 
   get isAudioEnabled(): boolean {
     return this.audioService.isAudioEnabled;
@@ -54,6 +57,18 @@ export class HeaderComponent implements AfterViewInit {
   }
   public toggleAudio(): void {
     this.audioService.toggleAudio();
+  }
+
+  public playAudio(): void {
+    if (!this.localStorageService.isDevModeEnabled) {
+      return;
+    }
+
+    if (Math.random() < 0.5) {
+      this.audioService.howlChime();
+      return;
+    }
+    this.audioService.howlSeatbelt();
   }
 
   public handleUserPreferencesForAudio(audioEnabled: boolean): void {

@@ -3,10 +3,16 @@
   <span class="time">{{ timeService.currentTimeDisplay$ | async }}</span>
   <span class="schedule-type"
     >Today's Schedule:
-    {{
-      (scheduleService.todaysSchedule$ | async)?.scheduleDescription
-    }}</span
+    {{ (scheduleService.todaysSchedule$ | async)?.scheduleDescription }}</span
   >
+  <button
+    *ngIf="localStorageService.isDevModeEnabled"
+    id="play-audio-btn"
+    class="button"
+    (click)="playAudio()"
+  >
+    play audio
+  </button>
   <button
     *ngIf="!isAudioEnabled"
     id="enable-alerts-btn"
