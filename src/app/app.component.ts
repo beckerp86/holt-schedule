@@ -70,8 +70,6 @@ export class AppComponent {
 
   private handleDevTesting(): void {
     if (!this._isDevTesting) {
-      this.localStorageService.setNewDevModeState(false);
-      this.localStorageService.setNewDevModeEmulatedDateTime(undefined);
       return;
     }
 

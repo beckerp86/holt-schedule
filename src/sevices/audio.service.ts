@@ -30,8 +30,12 @@ export class AudioService {
 
   private howl(src: string): void {
     if (!this.isAudioEnabled) return;
-    const sound = new Howl({ src });
-    sound.play();
+    try {
+      const sound = new Howl({ src });
+      sound.play();
+    } catch (error: unknown) {
+      console.log(error);
+    }
   }
 
   private getFilepath(audioFileEnum: AudioFileEnum, audioFileFormat: AudioFileFormat): string {
