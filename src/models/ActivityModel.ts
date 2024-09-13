@@ -99,8 +99,8 @@ export class Activity {
         return 'Lunch Break';
       case ActivityTypeEnum.PTC_Conferences:
         return 'Conferences';
-      case ActivityTypeEnum.MorningPlanning:
-        return 'Morning Planning';
+      case ActivityTypeEnum.MorningPrep:
+        return 'Morning Prep';
     }
   }
 
@@ -168,5 +168,5 @@ export enum ActivityTypeEnum {
   PD,
   PTC_Lunch,
   PTC_Conferences,
-  MorningPlanning,
+  MorningPrep,
 }
