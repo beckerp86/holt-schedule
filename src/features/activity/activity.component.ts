@@ -5,7 +5,7 @@ import { AudioService } from '../../sevices/audio.service';
 import { BehaviorSubject, combineLatest, debounceTime, Subject, takeUntil } from 'rxjs';
 import { NumberUtil } from '../../utils/NumberUtil';
 import { ResizeObservableService } from '../../sevices/resize-observable.service';
-import { ScheduleOverrideService } from '../../sevices/schedule-override.service';
+import { ScheduleService } from '../../sevices/schedule.service';
 import { TimeService } from '../../sevices/time.service';
 import { TimeUtil } from '../../utils/TimeUtil';
 
@@ -22,7 +22,7 @@ export class ActivityComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('timerIcon', { static: false }) public timerIcon!: ElementRef;
 
   public timeService = inject(TimeService);
-  public scheduleOverrideService = inject(ScheduleOverrideService);
+  public scheduleService = inject(ScheduleService);
   private resizeService = inject(ResizeObservableService);
   private audioService = inject(AudioService);
 
@@ -90,11 +90,11 @@ export class ActivityComponent implements OnInit, AfterViewInit, OnDestroy {
     this.percentCompleteSubject.next(percentComplete);
   }
 
-  private async updateCountdownDisplay(): Promise<void> {
+  private async updateCountdownDisplay(now: Date): Promise<void> {
     if (!this.activity) {
       return;
     }
-    const duration = TimeUtil.getDurationBetweenDates(new Date(), this.activity.endDate);
+    const duration = TimeUtil.getDurationBetweenDates(now, this.activity.endDate);
     this.countdownDisplaySubject.next(TimeUtil.getTimerDisplay(duration));
   }
 
@@ -137,24 +137,40 @@ export class ActivityComponent implements OnInit, AfterViewInit, OnDestroy {
     // this.audioService.howlSeatbelt();
   }
 
-  private updateCanLeaveClass(nowMs: number): void {
-    if (!this.activity || !this.activity.studentsWillBeAbleToLeaveClassAtSomePoint) {
+  private async updateCanLeaveClass(nowMs: number): Promise<void> {
+    if (
+      this.activity === undefined ||
+      this.activity.isInstructionalTime !== true ||
+      this.activity.canLeaveClassStart === undefined ||
+      this.activity.canLeaveClassEnd === undefined ||
+      this.activity.parentSchedule === undefined
+    ) {
       return;
     }
 
-    const canLeaveClassNow =
-      nowMs >= this.activity.canLeaveClassStart!.getTime() && nowMs <= this.activity.canLeaveClassEnd!.getTime();
-    this.canLeaveClassSubject.next(canLeaveClassNow);
+    const allowedByTenMinuteRule = TimeUtil.isTimeBetweenInclusive(
+      nowMs,
+      this.activity.canLeaveClassStart!.getTime(),
+      this.activity.canLeaveClassEnd!.getTime()
+    );
+    if (!allowedByTenMinuteRule) {
+      this.canLeaveClassSubject.next(allowedByTenMinuteRule);
+      return;
+    }
+    const allowedByLunchRule = !this.activity.parentSchedule?.isInBlackoutTime(nowMs);
+    this.canLeaveClassSubject.next(allowedByLunchRule);
   }
 
   private async initSubscriptions(): Promise<void> {
     // updates percent complete observable
     this.timeService.currentDateTime$.pipe(takeUntil(this.ngUnsubscribe$)).subscribe(async (now: Date) => {
       const nowMs = now.getTime();
-      await this.updatePercentComplete(nowMs);
-      await this.updateCountdownDisplay();
-      await this.playWarningChime(nowMs);
-      this.updateCanLeaveClass(nowMs);
+      Promise.all([
+        this.updatePercentComplete(nowMs),
+        this.updateCountdownDisplay(now),
+        this.playWarningChime(nowMs),
+        this.updateCanLeaveClass(nowMs),
+      ]);
     });
 
     // updates progress bar width observable

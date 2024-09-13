@@ -1,12 +1,15 @@
 import { BehaviorSubject, of, pairwise, repeat } from 'rxjs';
 import { DateUtil } from '../utils/DateUtil';
-import { Injectable } from '@angular/core';
+import { LocalStorageService } from './local-storage.service';
 import { TimeUtil } from '../utils/TimeUtil';
+import { inject, Injectable } from '@angular/core';
 
 @Injectable({
   providedIn: 'root',
 })
 export class TimeService {
+  private localStorageService = inject(LocalStorageService);
+
   private _currentTimeDisplaySubject = new BehaviorSubject<string>('');
   public currentTimeDisplay$ = this._currentTimeDisplaySubject.asObservable();
 
@@ -26,11 +29,27 @@ export class TimeService {
     this.setNewDateDisplay(constructionDate);
 
     // Every second, update the Date observable
-    of(null)
-      .pipe(repeat({ delay: 1000 }))
-      .subscribe(() => {
-        this._currentDateSubject.next(new Date());
-      });
+    if (this.localStorageService.isDevModeEnabled && !!this.localStorageService.devModeEmulatedDateTime) {
+      // We are in dev mode, and we want to start adding seconds to the DevMode emulated date.
+      of(null)
+        .pipe(repeat({ delay: 1000 }))
+        .subscribe(() => {
+          const localStorageDate = this.localStorageService.devModeEmulatedDateTime;
+          if (!localStorageDate) {
+            throw new Error('LocalStorageService.devModeEmulatedDateTime is null');
+          }
+          localStorageDate?.setTime(localStorageDate.getTime() + 1000);
+          this.localStorageService.setNewDevModeEmulatedDateTime(localStorageDate);
+          this._currentDateSubject.next(localStorageDate);
+        });
+    } else {
+      // default resolution of current DateTime
+      of(null)
+        .pipe(repeat({ delay: 1000 }))
+        .subscribe(() => {
+          this._currentDateSubject.next(new Date());
+        });
+    }
 
     // When the date observable changes, we may need to update the Date or Time display
     this.currentDateTime$.pipe(pairwise()).subscribe(([prev, next]: Date[]) => {
@@ -51,7 +70,6 @@ export class TimeService {
 
   private setNewTimeDisplay(date: Date): void {
     const timeDisplay = TimeUtil.getTimeDisplayStringForDate(date);
-
     this._currentTimeDisplaySubject.next(timeDisplay);
   }
 }

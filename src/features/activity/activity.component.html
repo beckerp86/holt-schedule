@@ -2,9 +2,7 @@
   <div class="activity">
     <span class="activity-name"
       ><span>{{ activity?.typeDescription }} </span>
-      <span
-        *ngIf="activity?.studentsWillBeAbleToLeaveClassAtSomePoint === true"
-      >
+      <span *ngIf="activity?.willStudentsBeAbleToLeave === true">
         <span
           class="circle"
           [ngClass]="(canLeaveClass$ | async) ? 'green' : 'red'"

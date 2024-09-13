@@ -9,6 +9,10 @@ export abstract class TimeUtil {
     return prev.getTime() > next.getTime();
   }
 
+  public static isTimeBetweenInclusive(nowMs: number, startMs: number, endMs: number): boolean {
+    return nowMs >= startMs && nowMs <= endMs;
+  }
+
   public static addMinutes(date: Date, minutes: number): Date {
     return new Date(date.getTime() + minutes * 60000);
   }
@@ -19,12 +23,6 @@ export abstract class TimeUtil {
 
   public static getTimerDisplayBetweenTwoDates(startDate: Date, endDate: Date): string {
     return TimeUtil.getTimerDisplay(TimeUtil.getDurationBetweenDates(startDate, endDate));
-  }
-
-  public static getEndDateForDuration(startDateTime: Date, durationMinutes: number): Date {
-    const endDate = new Date(startDateTime);
-    endDate.setMinutes(startDateTime.getMinutes() + durationMinutes);
-    return endDate;
   }
 
   public static getTimeDisplayStringForDate(date: Date): string {

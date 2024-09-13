@@ -1,12 +1,13 @@
 import { TimeUtil } from '../utils/TimeUtil';
+import { ScheduleModel } from './Schedules/ScheduleModel';
 
 export class Activity {
-  private readonly _type: ActivityTypeEnum;
   private readonly _minuteAllowanceToLeaveClass: number = 10;
-
   private _isInstructionalTime: boolean = false;
   private _canLeaveClassStart: Date | undefined = undefined;
   private _canLeaveClassEnd: Date | undefined = undefined;
+
+  readonly type: ActivityTypeEnum;
   readonly startHour: number;
   readonly startMinute: number;
   readonly durationMinutes: number;
@@ -14,12 +15,14 @@ export class Activity {
   readonly startDate: Date;
   readonly endDate: Date;
 
+  public parentSchedule?: ScheduleModel;
+
   get isInstructionalTime(): boolean {
     return this._isInstructionalTime;
   }
 
-  get studentsWillBeAbleToLeaveClassAtSomePoint(): boolean {
-    return this._canLeaveClassStart !== undefined && this._canLeaveClassEnd !== undefined;
+  get willStudentsBeAbleToLeave(): boolean {
+    return this.isInstructionalTime && !!this._canLeaveClassStart && !!this._canLeaveClassEnd;
   }
 
   get canLeaveClassStart(): Date | undefined {
@@ -37,7 +40,7 @@ export class Activity {
     durationMinutes: number,
     warnWhenMinutesRemain: number = 0
   ) {
-    this._type = typeEnum;
+    this.type = typeEnum;
     this.startHour = startHour;
     this.startMinute = startMinute;
     this.durationMinutes = durationMinutes;
@@ -53,13 +56,13 @@ export class Activity {
       0,
       0
     );
-    this.endDate = TimeUtil.getEndDateForDuration(this.startDate, durationMinutes);
+    this.endDate = TimeUtil.addMinutes(this.startDate, durationMinutes);
     this.setInstructionalTime();
     this.setAllowedRangeToLeaveClass();
   }
 
   get typeDescription(): string {
-    switch (this._type) {
+    switch (this.type) {
       case ActivityTypeEnum.FirstHour:
         return '1st Hour';
       case ActivityTypeEnum.SecondHour:
@@ -102,7 +105,7 @@ export class Activity {
   }
 
   private setAllowedRangeToLeaveClass(): void {
-    if (!this.isInstructionalTime || !this.canLeaveClassIfConditionsAreMet()) {
+    if (!this.isInstructionalTime) {
       return;
     }
 
@@ -111,7 +114,7 @@ export class Activity {
   }
 
   private setInstructionalTime(): void {
-    switch (this._type) {
+    switch (this.type) {
       case ActivityTypeEnum.FirstHour:
         this._isInstructionalTime = true;
         break;
@@ -142,17 +145,6 @@ export class Activity {
       default:
         this._isInstructionalTime = false;
         break;
-    }
-  }
-
-  private canLeaveClassIfConditionsAreMet(): boolean {
-    switch (this._type) {
-      case ActivityTypeEnum.ALunchClass:
-        return false;
-      case ActivityTypeEnum.BLunchClass:
-        return false;
-      default:
-        return true;
     }
   }
 }

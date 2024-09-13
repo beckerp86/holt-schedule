@@ -2,7 +2,7 @@ import Swal, { SweetAlertResult } from 'sweetalert2';
 import { AfterViewInit, Component, inject } from '@angular/core';
 import { AudioService } from '../../sevices/audio.service';
 import { CommonModule } from '@angular/common';
-import { ScheduleOverrideService } from '../../sevices/schedule-override.service';
+import { ScheduleService } from '../../sevices/schedule.service';
 import { TimeService } from '../../sevices/time.service';
 
 @Component({
@@ -15,7 +15,7 @@ import { TimeService } from '../../sevices/time.service';
 export class HeaderComponent implements AfterViewInit {
   constructor() {}
   public timeService = inject(TimeService);
-  public scheduleOverrideService = inject(ScheduleOverrideService);
+  public scheduleService = inject(ScheduleService);
   private audioService = inject(AudioService);
 
   get isAudioEnabled(): boolean {
@@ -32,7 +32,7 @@ export class HeaderComponent implements AfterViewInit {
       showConfirmButton: true,
       confirmButtonText: 'Yup!',
       showDenyButton: true,
-      denyButtonText: 'Nope',
+      denyButtonText: 'Nope!',
     }).then((result: SweetAlertResult) => {
       this.handleUserPreferencesForAudio(result.isConfirmed);
       if (result.isConfirmed) {

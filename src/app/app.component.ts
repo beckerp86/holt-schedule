@@ -1,13 +1,15 @@
-import { Activity, ActivityTypeEnum } from '../models/ActivityModel';
+import { Activity } from '../models/ActivityModel';
 import { ActivityComponent } from '../features/activity/activity.component';
 import { ArrayUtil } from '../utils/ArrayUtil';
 import { BehaviorSubject, distinctUntilChanged } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { Component, inject } from '@angular/core';
+import { DailySchedule } from '../models/DailySchedule';
 import { FooterComponent } from '../features/footer/footer.component';
 import { HeaderComponent } from '../features/header/header.component';
+import { LocalStorageService } from '../sevices/local-storage.service';
 import { RouterOutlet } from '@angular/router';
-import { ScheduleOverrideService } from '../sevices/schedule-override.service';
+import { ScheduleService } from '../sevices/schedule.service';
 import { TimeService } from '../sevices/time.service';
 
 @Component({
@@ -18,8 +20,9 @@ import { TimeService } from '../sevices/time.service';
   styleUrl: './app.component.css',
 })
 export class AppComponent {
-  private scheduleOverrideService = inject(ScheduleOverrideService);
+  private scheduleService = inject(ScheduleService);
   private timeService = inject(TimeService);
+  private localStorageService = inject(LocalStorageService);
 
   private activities: Activity[] = [];
 
@@ -30,6 +33,8 @@ export class AppComponent {
   public currentActivities$ = this.currentActivitiesSubject.asObservable().pipe(distinctUntilChanged());
 
   constructor() {
+    this.handleDevTesting();
+
     // Every second, check to make sure only the active activities are displayed
     this.timeService.currentDateTime$.subscribe((now: Date) => {
       if (ArrayUtil.IsArrayAndHasItems(this.activities)) {
@@ -37,15 +42,20 @@ export class AppComponent {
       }
     });
 
-    if (this._isDevTesting) {
-      this.handleDevTesting();
-      return;
-    }
     // When date changes, fetch new day's schedule
-    this.scheduleOverrideService.todaysSchedule$.subscribe((schedule) => {
-      if (schedule) {
-        this.activities = schedule.schedule?.activities ?? [];
+    this.scheduleService.todaysSchedule$.subscribe((schedule: DailySchedule | undefined) => {
+      // add parent schedule to each activity
+      if (ArrayUtil.IsArrayAndHasItems(schedule?.schedule?.activities)) {
+        const activitiesWithSchedule: Activity[] = [];
+        for (let i = 0; i < schedule!.schedule!.activities.length; i++) {
+          const activity = schedule!.schedule!.activities[i];
+          activity.parentSchedule = schedule?.schedule;
+          activitiesWithSchedule.push(activity);
+        }
+        this.activities = activitiesWithSchedule;
+        return;
       }
+      this.activities = [];
     });
   }
 
@@ -59,17 +69,15 @@ export class AppComponent {
   }
 
   private handleDevTesting(): void {
-    if (!this._isDevTesting) return;
-    const now = new Date();
-    const nowHours = now.getHours();
-    const nowMinutes = now.getMinutes();
+    if (!this._isDevTesting) {
+      this.localStorageService.setNewDevModeState(false);
+      this.localStorageService.setNewDevModeEmulatedDateTime(undefined);
+      return;
+    }
 
-    const activity1 = new Activity(ActivityTypeEnum.Transition, nowHours, nowMinutes, 1);
-    const activity2 = new Activity(ActivityTypeEnum.FirstHour, nowHours, nowMinutes, 2, 1);
-    const activity3 = new Activity(ActivityTypeEnum.SecondHour, nowHours, nowMinutes, 3, 1);
-    const activity4 = new Activity(ActivityTypeEnum.PTC_Conferences, nowHours, nowMinutes, 4, 1);
-
-    this.activities = [activity1, activity2, activity3, activity4];
-    this.currentActivitiesSubject.next(this.activities);
+    // Set the date here where we want to start testing from.
+    const now = new Date(2024, 8, 12, 12, 28, 50);
+    this.localStorageService.setNewDevModeState(true);
+    this.localStorageService.setNewDevModeEmulatedDateTime(now);
   }
 }

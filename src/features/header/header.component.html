@@ -1,9 +1,12 @@
 <div class="header">
   <span class="date">{{ timeService.currentDateDisplay$ | async }}</span>
   <span class="time">{{ timeService.currentTimeDisplay$ | async }}</span>
-  <span class="schedule-type">{{
-    (scheduleOverrideService.todaysSchedule$ | async)?.scheduleDescription
-  }}</span>
+  <span class="schedule-type"
+    >Today's Schedule:
+    {{
+      (scheduleService.todaysSchedule$ | async)?.scheduleDescription
+    }}</span
+  >
   <button
     *ngIf="!isAudioEnabled"
     id="enable-alerts-btn"
