@@ -73,8 +73,9 @@ export class ScheduleService {
     let date = new Date();
     for (let i = 0; i < 30; i++) {
       date.setDate(date.getDate() + 1);
-      const schedule = new DailySchedule(this.getScheduleTypeForDate(date));
-      if (schedule.schedule?.type !== ScheduleTypeEnum.NoSchool) {
+      const scheduleType = this.getScheduleTypeForDate(date);
+      if (scheduleType !== ScheduleTypeEnum.NoSchool) {
+        const schedule = new DailySchedule(scheduleType);
         this._nextScheduleSubject.next({ date, schedule });
         return;
       }
