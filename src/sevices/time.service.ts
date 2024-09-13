@@ -29,17 +29,25 @@ export class TimeService {
     this.setNewDateDisplay(constructionDate);
 
     // Every second, update the Date observable
-    if (this.localStorageService.isDevModeEnabled && !!this.localStorageService.devModeEmulatedDateTime) {
+    if (
+      this.localStorageService.isDevModeEnabled &&
+      !!this.localStorageService.devModeEmulatedDateTime
+    ) {
       // We are in dev mode, and we want to start adding seconds to the DevMode emulated date.
       of(null)
         .pipe(repeat({ delay: 1000 }))
         .subscribe(() => {
-          const localStorageDate = this.localStorageService.devModeEmulatedDateTime;
+          const localStorageDate =
+            this.localStorageService.devModeEmulatedDateTime;
           if (!localStorageDate) {
-            throw new Error('LocalStorageService.devModeEmulatedDateTime is null');
+            throw new Error(
+              'LocalStorageService.devModeEmulatedDateTime is null'
+            );
           }
           localStorageDate?.setTime(localStorageDate.getTime() + 1000);
-          this.localStorageService.setNewDevModeEmulatedDateTime(localStorageDate);
+          this.localStorageService.setNewDevModeEmulatedDateTime(
+            localStorageDate
+          );
           this._currentDateSubject.next(localStorageDate);
         });
     } else {

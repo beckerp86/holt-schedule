@@ -1,8 +1,23 @@
 import { Activity } from '../../models/ActivityModel';
-import { AfterViewInit, Component, ElementRef, inject, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  ElementRef,
+  inject,
+  Input,
+  OnDestroy,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
 import { AsyncPipe, NgClass, NgIf } from '@angular/common';
 import { AudioService } from '../../sevices/audio.service';
-import { BehaviorSubject, combineLatest, debounceTime, Subject, takeUntil } from 'rxjs';
+import {
+  BehaviorSubject,
+  combineLatest,
+  debounceTime,
+  Subject,
+  takeUntil,
+} from 'rxjs';
 import { NumberUtil } from '../../utils/NumberUtil';
 import { ResizeObservableService } from '../../sevices/resize-observable.service';
 import { ScheduleService } from '../../sevices/schedule.service';
@@ -40,13 +55,17 @@ export class ActivityComponent implements OnInit, AfterViewInit, OnDestroy {
   public percentComplete$ = this.percentCompleteSubject.asObservable();
 
   private progressBarCurrentPixelWidthSubject = new BehaviorSubject<number>(0);
-  public progressBarCurrentPixelWidth$ = this.progressBarCurrentPixelWidthSubject.asObservable();
+  public progressBarCurrentPixelWidth$ =
+    this.progressBarCurrentPixelWidthSubject.asObservable();
 
   private countdownDisplaySubject = new BehaviorSubject<string>('');
   public countdownDisplay$ = this.countdownDisplaySubject.asObservable();
 
-  private progressBarContainerPixelWidthSubject = new BehaviorSubject<number>(1920);
-  public progressBarContainerPixelWidth$ = this.progressBarContainerPixelWidthSubject.asObservable();
+  private progressBarContainerPixelWidthSubject = new BehaviorSubject<number>(
+    1920
+  );
+  public progressBarContainerPixelWidth$ =
+    this.progressBarContainerPixelWidthSubject.asObservable();
 
   private canLeaveClassSubject = new BehaviorSubject<boolean>(false);
   public canLeaveClass$ = this.canLeaveClassSubject.asObservable();
@@ -73,9 +92,11 @@ export class ActivityComponent implements OnInit, AfterViewInit, OnDestroy {
       });
 
     // Watch for intended width of actual progress bar, then go update the style
-    this.progressBarCurrentPixelWidth$.pipe(takeUntil(this.ngUnsubscribe$)).subscribe((widthPx: number) => {
-      this.updateProgressBarWidth(widthPx);
-    });
+    this.progressBarCurrentPixelWidth$
+      .pipe(takeUntil(this.ngUnsubscribe$))
+      .subscribe((widthPx: number) => {
+        this.updateProgressBarWidth(widthPx);
+      });
   }
 
   ngOnDestroy(): void {
@@ -84,7 +105,8 @@ export class ActivityComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private async updatePercentComplete(nowMs: number): Promise<void> {
-    let percentComplete = (nowMs - this._startMs) / (this._endMs - this._startMs);
+    let percentComplete =
+      (nowMs - this._startMs) / (this._endMs - this._startMs);
     percentComplete > 1 ? 1 : percentComplete; // cap percent complete at 100%
 
     this.percentCompleteSubject.next(percentComplete);
@@ -94,7 +116,10 @@ export class ActivityComponent implements OnInit, AfterViewInit, OnDestroy {
     if (!this.activity) {
       return;
     }
-    const duration = TimeUtil.getDurationBetweenDates(now, this.activity.endDate);
+    const duration = TimeUtil.getDurationBetweenDates(
+      now,
+      this.activity.endDate
+    );
     this.countdownDisplaySubject.next(TimeUtil.getTimerDisplay(duration));
   }
 
@@ -120,7 +145,8 @@ export class ActivityComponent implements OnInit, AfterViewInit, OnDestroy {
     ) {
       return;
     }
-    const chimeMs = this._endMs - this.activity.warnWhenMinutesRemain * 60 * 1000;
+    const chimeMs =
+      this._endMs - this.activity.warnWhenMinutesRemain * 60 * 1000;
     if (nowMs >= chimeMs) {
       this.makeTimerJump();
       this.playedWarningChime = true;
@@ -157,21 +183,24 @@ export class ActivityComponent implements OnInit, AfterViewInit, OnDestroy {
       this.canLeaveClassSubject.next(allowedByTenMinuteRule);
       return;
     }
-    const allowedByLunchRule = !this.activity.parentSchedule?.isInBlackoutTime(nowMs);
+    const allowedByLunchRule =
+      !this.activity.parentSchedule?.isInBlackoutTime(nowMs);
     this.canLeaveClassSubject.next(allowedByLunchRule);
   }
 
   private async initSubscriptions(): Promise<void> {
     // updates percent complete observable
-    this.timeService.currentDateTime$.pipe(takeUntil(this.ngUnsubscribe$)).subscribe(async (now: Date) => {
-      const nowMs = now.getTime();
-      Promise.all([
-        this.updatePercentComplete(nowMs),
-        this.updateCountdownDisplay(now),
-        this.playWarningChime(nowMs),
-        this.updateCanLeaveClass(nowMs),
-      ]);
-    });
+    this.timeService.currentDateTime$
+      .pipe(takeUntil(this.ngUnsubscribe$))
+      .subscribe(async (now: Date) => {
+        const nowMs = now.getTime();
+        Promise.all([
+          this.updatePercentComplete(nowMs),
+          this.updateCountdownDisplay(now),
+          this.playWarningChime(nowMs),
+          this.updateCanLeaveClass(nowMs),
+        ]);
+      });
 
     // updates progress bar width observable
     combineLatest([this.percentComplete$, this.progressBarContainerPixelWidth$])
@@ -186,7 +215,9 @@ export class ActivityComponent implements OnInit, AfterViewInit, OnDestroy {
           return;
         }
         this.isComplete = percentComplete >= 1;
-        const nextWidth = Math.floor(percentComplete * progressBarContainerPixelWidth);
+        const nextWidth = Math.floor(
+          percentComplete * progressBarContainerPixelWidth
+        );
         this.progressBarCurrentPixelWidthSubject.next(nextWidth);
       });
   }

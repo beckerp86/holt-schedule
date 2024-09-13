@@ -16,17 +16,24 @@ export class FooterComponent {
   public footerContent: string[] = [];
 
   constructor() {
-    this.scheduleService.nextSchedule$.subscribe((nextSchedule: INextSchedule | null) => {
-      if (nextSchedule === null) {
-        this.footerContent = ['SUMMER BREAK', 'SUMMER BREAK', 'SUMMER BREAK'];
-        return;
+    this.scheduleService.nextSchedule$.subscribe(
+      (nextSchedule: INextSchedule | null) => {
+        if (nextSchedule === null) {
+          this.footerContent = ['SUMMER BREAK', 'SUMMER BREAK', 'SUMMER BREAK'];
+          return;
+        }
+        const daysBetween = DateUtil.getNumberOfDaysBetweenDates(
+          new Date(),
+          nextSchedule.date
+        );
+        this.footerContent = [
+          `Next school day is ${
+            daysBetween === 1 ? 'tomorrow' : `in ${daysBetween} days`
+          }`,
+          `on ${DateUtil.getDateDisplayStringForDate(nextSchedule.date)}`,
+          `Schedule Type:   ${nextSchedule.schedule.scheduleDescription}`,
+        ];
       }
-      const daysBetween = DateUtil.getNumberOfDaysBetweenDates(new Date(), nextSchedule.date);
-      this.footerContent = [
-        `Next school day is ${daysBetween === 1 ? 'tomorrow' : `in ${daysBetween} days`}`,
-        `on ${DateUtil.getDateDisplayStringForDate(nextSchedule.date)}`,
-        `Schedule Type:   ${nextSchedule.schedule.scheduleDescription}`,
-      ];
-    });
+    );
   }
 }

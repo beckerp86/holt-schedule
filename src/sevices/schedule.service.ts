@@ -20,10 +20,14 @@ export class ScheduleService {
 
   private timeService = inject(TimeService);
 
-  private _todaysScheduleSubject = new BehaviorSubject<DailySchedule | undefined>(undefined);
+  private _todaysScheduleSubject = new BehaviorSubject<
+    DailySchedule | undefined
+  >(undefined);
   public todaysSchedule$ = this._todaysScheduleSubject.asObservable();
 
-  private _nextScheduleSubject = new BehaviorSubject<INextSchedule | null>(null);
+  private _nextScheduleSubject = new BehaviorSubject<INextSchedule | null>(
+    null
+  );
   public nextSchedule$ = this._nextScheduleSubject.asObservable();
 
   private readonly _overrides: IScheduleOverride[] = [
@@ -34,12 +38,17 @@ export class ScheduleService {
   ];
 
   private getScheduleTypeForDate(date: Date): ScheduleTypeEnum {
-    return this.getOverriddenScheduleTypeForDate(date) ?? this.getDefaultScheduleForDayOfWeek(date);
+    return (
+      this.getOverriddenScheduleTypeForDate(date) ??
+      this.getDefaultScheduleForDayOfWeek(date)
+    );
   }
 
-  private getOverriddenScheduleTypeForDate(date: Date): ScheduleTypeEnum | undefined {
+  private getOverriddenScheduleTypeForDate(
+    date: Date
+  ): ScheduleTypeEnum | undefined {
     return this._overrides.find(
-      (x) =>
+      x =>
         x.date.getDate() === date.getDate() &&
         x.date.getMonth() === date.getMonth() &&
         x.date.getFullYear() === date.getFullYear()
@@ -65,7 +74,9 @@ export class ScheduleService {
   }
 
   private setTodaysSchedule(): void {
-    const todaysSchedule = new DailySchedule(this.getScheduleTypeForDate(new Date()));
+    const todaysSchedule = new DailySchedule(
+      this.getScheduleTypeForDate(new Date())
+    );
     this._todaysScheduleSubject.next(todaysSchedule);
   }
 

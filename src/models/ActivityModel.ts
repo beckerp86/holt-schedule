@@ -22,7 +22,11 @@ export class Activity {
   }
 
   get willStudentsBeAbleToLeave(): boolean {
-    return this.isInstructionalTime && !!this._canLeaveClassStart && !!this._canLeaveClassEnd;
+    return (
+      this.isInstructionalTime &&
+      !!this._canLeaveClassStart &&
+      !!this._canLeaveClassEnd
+    );
   }
 
   get canLeaveClassStart(): Date | undefined {
@@ -109,8 +113,14 @@ export class Activity {
       return;
     }
 
-    this._canLeaveClassStart = TimeUtil.addMinutes(this.startDate, this._minuteAllowanceToLeaveClass);
-    this._canLeaveClassEnd = TimeUtil.addMinutes(this.endDate, -this._minuteAllowanceToLeaveClass);
+    this._canLeaveClassStart = TimeUtil.addMinutes(
+      this.startDate,
+      this._minuteAllowanceToLeaveClass
+    );
+    this._canLeaveClassEnd = TimeUtil.addMinutes(
+      this.endDate,
+      -this._minuteAllowanceToLeaveClass
+    );
   }
 
   private setInstructionalTime(): void {

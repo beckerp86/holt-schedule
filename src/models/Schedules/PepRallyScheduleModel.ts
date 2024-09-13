@@ -5,7 +5,7 @@ import { ScheduleModel } from './ScheduleModel';
 export class PepRallySchedule extends ScheduleModel {
   constructor() {
     super(ScheduleTypeEnum.PepRally);
-    
+
     this.setActivitiesForType([
       new Activity(ActivityTypeEnum.FirstHour, 7, 30, 53, 2),
       new Activity(ActivityTypeEnum.Transition, 8, 23, 5),

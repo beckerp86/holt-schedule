@@ -1,39 +1,66 @@
-import { Injectable } from '@angular/core';
+import { DOCUMENT } from '@angular/common';
+import { inject, Injectable } from '@angular/core';
 
 @Injectable({
   providedIn: 'root',
 })
 export class LocalStorageService {
   constructor() {}
+  private readonly localStorage = inject(DOCUMENT)?.defaultView?.localStorage;
   get isDevModeEnabled(): boolean {
-    return localStorage.getItem(LocalStorageKeys.IsDevMode) === 'true';
+    return this.get<boolean>(LocalStorageKey.IsDevMode) ?? false;
   }
 
-  get devModeEmulatedDateTime(): Date | undefined {
-    const devModeEmulatedDateTime = localStorage.getItem(LocalStorageKeys.DevModeEmulatedDateTime);
-    return !devModeEmulatedDateTime ? undefined : new Date(devModeEmulatedDateTime);
+  get devModeEmulatedDateTime(): Date | null {
+    return this.get<Date>(LocalStorageKey.DevModeEmulatedDateTime);
   }
 
   get isAudioEnabled(): boolean {
-    return localStorage.getItem(LocalStorageKeys.IsAudioEnabled) === 'true';
+    return this.get<boolean>(LocalStorageKey.IsAudioEnabled) ?? false;
   }
 
-  setAudioEnabledStatus(newvalue: boolean): void {
-    localStorage.setItem(LocalStorageKeys.IsAudioEnabled, `${newvalue}`);
+  setAudioEnabledState(newvalue: boolean): void {
+    this.set(LocalStorageKey.IsAudioEnabled, newvalue);
   }
 
-  setNewDevModeState(isDevModeEnabled: boolean): void {
-    localStorage.setItem(LocalStorageKeys.IsDevMode, `${isDevModeEnabled}`);
+  setDevModeEnabledState(isDevModeEnabled: boolean): void {
+    this.set(LocalStorageKey.IsDevMode, isDevModeEnabled);
   }
 
   setNewDevModeEmulatedDateTime(date: Date | undefined): void {
     const newValue = !date ? '' : date.toISOString();
-    localStorage.setItem(LocalStorageKeys.DevModeEmulatedDateTime, newValue);
-    return;
+    this.set(LocalStorageKey.DevModeEmulatedDateTime, newValue);
+  }
+
+  private get<T>(key: LocalStorageKey): T | null {
+    const item = this.localStorage?.getItem(key.toString());
+
+    if (!item) {
+      return null;
+    }
+
+    return this.isJSONValid(item) ? (JSON.parse(item) as T) : (item as T);
+  }
+
+  private set(key: LocalStorageKey, value: unknown): void {
+    this.localStorage?.setItem(key.toString(), JSON.stringify(value));
+  }
+
+  private remove(key: LocalStorageKey): void {
+    this.localStorage?.removeItem(key.toString());
+  }
+
+  private isJSONValid(value: string): boolean {
+    try {
+      JSON.parse(value);
+      return true;
+    } catch (error) {
+      return false;
+    }
   }
 }
 
-export enum LocalStorageKeys {
+export enum LocalStorageKey {
   IsDevMode = 'IsDevMode',
   DevModeEmulatedDateTime = 'DevModeEmulatedDateTime',
   IsAudioEnabled = 'IsAudioEnabled',

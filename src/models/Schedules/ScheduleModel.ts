@@ -3,7 +3,9 @@ import { Activity, ActivityTypeEnum } from '../ActivityModel';
 import { ScheduleTypeEnum } from '../ScheduleTypeEnum';
 
 export abstract class ScheduleModel {
-  private readonly _baseActivities: Activity[] = [new Activity(ActivityTypeEnum.MorningPrep, 7, 0, 30, 7)];
+  private readonly _baseActivities: Activity[] = [
+    new Activity(ActivityTypeEnum.MorningPrep, 7, 0, 30, 7),
+  ];
   private _activities: Activity[] = [];
   private _scheduleHasLunch: boolean = true;
   private _blackoutTimes: IBlackoutTimes | undefined = undefined;
@@ -27,7 +29,9 @@ export abstract class ScheduleModel {
 
   public setActivitiesForType(activities: Activity[]) {
     this._activities = activities;
-    this._scheduleHasLunch = this._activities.some((x: Activity) => x.type === ActivityTypeEnum.ALunch);
+    this._scheduleHasLunch = this._activities.some(
+      (x: Activity) => x.type === ActivityTypeEnum.ALunch
+    );
     this.setLunchBlackoutTime();
   }
 

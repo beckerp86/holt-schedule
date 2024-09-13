@@ -11,7 +11,10 @@ export class DailySchedule {
   protected readonly typeEnum: ScheduleTypeEnum;
   private readonly _overrideReason: string | undefined;
 
-  constructor(typeEnum: ScheduleTypeEnum, overrideReason: string | undefined = undefined) {
+  constructor(
+    typeEnum: ScheduleTypeEnum,
+    overrideReason: string | undefined = undefined
+  ) {
     this.typeEnum = typeEnum;
     this._overrideReason = overrideReason;
 
@@ -54,11 +57,17 @@ export class DailySchedule {
       case ScheduleTypeEnum.NoSchool:
         return this.getTypeDescriptionWithOverrideReason('No School');
       case ScheduleTypeEnum.HalfDay1And2:
-        return this.getTypeDescriptionWithOverrideReason('Half Day (Exams: 1st & 2nd Hour)');
+        return this.getTypeDescriptionWithOverrideReason(
+          'Half Day (Exams: 1st & 2nd Hour)'
+        );
       case ScheduleTypeEnum.HalfDay3And4:
-        return this.getTypeDescriptionWithOverrideReason('Half Day (Exams: 3rd & 4th Hour)');
+        return this.getTypeDescriptionWithOverrideReason(
+          'Half Day (Exams: 3rd & 4th Hour)'
+        );
       case ScheduleTypeEnum.HalfDay5And6:
-        return this.getTypeDescriptionWithOverrideReason('Half Day (Exams: 5th & 6th Hour)');
+        return this.getTypeDescriptionWithOverrideReason(
+          'Half Day (Exams: 5th & 6th Hour)'
+        );
       case ScheduleTypeEnum.HalfDay1Through3:
         return this.getTypeDescriptionWithOverrideReason('Half Day, hours 1-3');
       case ScheduleTypeEnum.HalfDay4Through6:
@@ -74,7 +83,11 @@ export class DailySchedule {
     }
   }
 
-  private getTypeDescriptionWithOverrideReason(typeDescription: string): string {
-    return !this._overrideReason ? typeDescription : `${typeDescription} | (${this._overrideReason})`;
+  private getTypeDescriptionWithOverrideReason(
+    typeDescription: string
+  ): string {
+    return !this._overrideReason
+      ? typeDescription
+      : `${typeDescription} | (${this._overrideReason})`;
   }
 }

@@ -2,7 +2,6 @@
   <app-header></app-header>
   <app-activity
     *ngFor="let activity of currentActivities$ | async"
-    [activity]="activity"
-  ></app-activity>
+    [activity]="activity"></app-activity>
   <app-footer></app-footer>
 </div>

@@ -1,13 +1,37 @@
 import { NumberUtil } from './NumberUtil';
 
 export abstract class DateUtil {
+  private static readonly _weekdays = [
+    'Sunday',
+    'Monday',
+    'Tuesday',
+    'Wednesday',
+    'Thursday',
+    'Friday',
+    'Saturday',
+  ];
+  private static readonly _months = [
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July',
+    'August',
+    'September',
+    'October',
+    'November',
+    'December',
+  ];
+
   public static generateRandomDateTime(): Date {
-    const year = NumberUtil.randomFromInterval(2024, 2026);
-    const month = NumberUtil.randomFromInterval(0, 11);
-    const day = NumberUtil.randomFromInterval(1, 28);
-    const hour = NumberUtil.randomFromInterval(0, 23);
-    const minute = NumberUtil.randomFromInterval(0, 59);
-    const seconds = NumberUtil.randomFromInterval(0, 59);
+    const year = NumberUtil.getRandomIntegerBetweenTwoNumbers(2024, 2026);
+    const month = NumberUtil.getRandomIntegerBetweenTwoNumbers(0, 11);
+    const day = NumberUtil.getRandomIntegerBetweenTwoNumbers(1, 28);
+    const hour = NumberUtil.getRandomIntegerBetweenTwoNumbers(0, 23);
+    const minute = NumberUtil.getRandomIntegerBetweenTwoNumbers(0, 59);
+    const seconds = NumberUtil.getRandomIntegerBetweenTwoNumbers(0, 59);
     return new Date(year, month, day, hour, minute, seconds);
   }
 
@@ -24,7 +48,10 @@ export abstract class DateUtil {
     return dateDisplay;
   }
 
-  public static getNumberOfDaysBetweenDates(startDate: Date, endDate: Date): number {
+  public static getNumberOfDaysBetweenDates(
+    startDate: Date,
+    endDate: Date
+  ): number {
     startDate.setHours(0, 0, 0, 0);
     endDate.setHours(0, 0, 0, 0);
     let startDateMs = startDate.getTime();
@@ -41,27 +68,10 @@ export abstract class DateUtil {
   }
 
   private static getDayOfWeekDisplay(date: Date): string {
-    const weekdays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-    const dayOfWeekIndex: number = date.getDay();
-    return weekdays[dayOfWeekIndex];
+    return this._weekdays[date.getDay()];
   }
 
   private static getMonthDisplay(date: Date): string {
-    const month = [
-      'January',
-      'February',
-      'March',
-      'April',
-      'May',
-      'June',
-      'July',
-      'August',
-      'September',
-      'October',
-      'November',
-      'December',
-    ];
-    const monthIndex: number = date.getMonth();
-    return month[monthIndex];
+    return this._months[date.getMonth()];
   }
 }

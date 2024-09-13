@@ -29,8 +29,13 @@ export class AudioService {
     }
   }
 
-  private getFilepath(audioFileEnum: AudioFileEnum, audioFileFormat: AudioFileFormat): string {
-    return `${this.environmentService.assetsPath}/${audioFileEnum.toString()}.${audioFileFormat.toString()}`;
+  private getFilepath(
+    audioFileEnum: AudioFileEnum,
+    audioFileFormat: AudioFileFormat
+  ): string {
+    return `${
+      this.environmentService.assetsPath
+    }/${audioFileEnum.toString()}.${audioFileFormat.toString()}`;
   }
 }
 

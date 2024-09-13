@@ -9,7 +9,11 @@ export abstract class TimeUtil {
     return prev.getTime() > next.getTime();
   }
 
-  public static isTimeBetweenInclusive(nowMs: number, startMs: number, endMs: number): boolean {
+  public static isTimeBetweenInclusive(
+    nowMs: number,
+    startMs: number,
+    endMs: number
+  ): boolean {
     return nowMs >= startMs && nowMs <= endMs;
   }
 
@@ -21,17 +25,24 @@ export abstract class TimeUtil {
     return prev.getMinutes() !== next.getMinutes();
   }
 
-  public static getTimerDisplayBetweenTwoDates(startDate: Date, endDate: Date): string {
-    return TimeUtil.getTimerDisplay(TimeUtil.getDurationBetweenDates(startDate, endDate));
+  public static getTimerDisplayBetweenTwoDates(
+    startDate: Date,
+    endDate: Date
+  ): string {
+    return TimeUtil.getTimerDisplay(
+      TimeUtil.getDurationBetweenDates(startDate, endDate)
+    );
   }
 
   public static getTimeDisplayStringForDate(date: Date): string {
     const hours = date.getHours();
     const amPmHours = TimeUtil.getAmPmHours(hours);
     const minutes = date.getMinutes();
-    const timeDisplay = `${TimeUtil.getHoursDisplay(amPmHours)}:${TimeUtil.getMinutesDisplay(
-      minutes
-    )} ${TimeUtil.getAmPmDisplay(hours)}`;
+    const timeDisplay = `${TimeUtil.getHoursDisplay(
+      amPmHours
+    )}:${TimeUtil.getMinutesDisplay(minutes)} ${TimeUtil.getAmPmDisplay(
+      hours
+    )}`;
     return timeDisplay;
   }
 

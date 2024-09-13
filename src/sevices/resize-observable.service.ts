@@ -1,5 +1,13 @@
 import { Injectable } from '@angular/core';
-import { distinctUntilChanged, filter, map, NextObserver, Observable, Subscriber, throttleTime } from 'rxjs';
+import {
+  distinctUntilChanged,
+  filter,
+  map,
+  NextObserver,
+  Observable,
+  Subscriber,
+  throttleTime,
+} from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -10,9 +18,11 @@ export class ResizeObservableService {
   private notifiers: NextObserver<ResizeObserverEntry[]>[] = [];
 
   constructor() {
-    this.resizeObserver = new ResizeObserver((entries: ResizeObserverEntry[]) => {
-      this.notifiers.forEach((obs) => obs.next(entries));
-    });
+    this.resizeObserver = new ResizeObserver(
+      (entries: ResizeObserverEntry[]) => {
+        this.notifiers.forEach(obs => obs.next(entries));
+      }
+    );
   }
 
   resizeObservable(elem: Element): Observable<ResizeObserverEntry> {
@@ -22,7 +32,7 @@ export class ResizeObservableService {
         this.notifiers.push(subscriber);
 
         return () => {
-          const idx = this.notifiers.findIndex((val) => val === subscriber);
+          const idx = this.notifiers.findIndex(val => val === subscriber);
           this.notifiers.splice(idx, 1);
           this.resizeObserver.unobserve(elem);
         };
@@ -30,7 +40,7 @@ export class ResizeObservableService {
     );
 
     return newObserverCandidate.pipe(
-      map((entries) => entries.find((entry) => entry.target === elem)),
+      map(entries => entries.find(entry => entry.target === elem)),
       filter(Boolean),
       throttleTime(this._throttleTime),
       distinctUntilChanged()
@@ -39,7 +49,7 @@ export class ResizeObservableService {
 
   widthResizeObservable(elem: Element): Observable<number> {
     return this.resizeObservable(elem).pipe(
-      map((entry) => entry.target.clientWidth),
+      map(entry => entry.target.clientWidth),
       filter(Boolean)
     );
   }
