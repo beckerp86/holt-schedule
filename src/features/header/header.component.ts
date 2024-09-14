@@ -13,7 +13,6 @@ import { TimeService } from '../../sevices/time.service';
   styleUrl: './header.component.css',
 })
 export class HeaderComponent {
-  constructor() {}
   private audioService = inject(AudioService);
   public localStorageService = inject(LocalStorageService);
 

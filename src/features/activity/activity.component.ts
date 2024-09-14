@@ -48,8 +48,8 @@ export class ActivityComponent implements OnInit, AfterViewInit, OnDestroy {
   private isComplete = false;
   private playedWarningChime = false;
 
-  private _startMs: number = 0;
-  private _endMs: number = 0;
+  private _startMs = 0;
+  private _endMs = 0;
 
   private percentCompleteSubject = new BehaviorSubject<number>(0);
   public percentComplete$ = this.percentCompleteSubject.asObservable();
@@ -107,7 +107,7 @@ export class ActivityComponent implements OnInit, AfterViewInit, OnDestroy {
   private async updatePercentComplete(nowMs: number): Promise<void> {
     let percentComplete =
       (nowMs - this._startMs) / (this._endMs - this._startMs);
-    percentComplete > 1 ? 1 : percentComplete; // cap percent complete at 100%
+    percentComplete = percentComplete > 1 ? 1 : percentComplete; // cap percent complete at 100%
 
     this.percentCompleteSubject.next(percentComplete);
   }

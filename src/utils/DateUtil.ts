@@ -54,8 +54,8 @@ export abstract class DateUtil {
   ): number {
     startDate.setHours(0, 0, 0, 0);
     endDate.setHours(0, 0, 0, 0);
-    let startDateMs = startDate.getTime();
-    let endDateMs = endDate.getTime();
+    const startDateMs = startDate.getTime();
+    const endDateMs = endDate.getTime();
     if (startDate >= endDate) {
       return 0; // The end date is actually before the start date
     }

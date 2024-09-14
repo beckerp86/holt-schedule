@@ -13,6 +13,4 @@ export class EnvironmentService implements IEnvironment {
   get assetsPath() {
     return environment.assetsPath;
   }
-
-  constructor() {}
 }

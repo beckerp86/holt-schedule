@@ -1,6 +1,6 @@
 export abstract class ArrayUtil {
   public static IsArrayAndHasItems(array: unknown): boolean {
-    return ArrayUtil.IsArray(array) && (array as Array<unknown>).length > 0;
+    return ArrayUtil.IsArray(array) && (array as unknown[]).length > 0;
   }
 
   public static IsArray(array: unknown): boolean {

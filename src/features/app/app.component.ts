@@ -56,8 +56,7 @@ export class AppComponent {
         // add parent schedule to each activity
         if (ArrayUtil.IsArrayAndHasItems(schedule?.schedule?.activities)) {
           const activitiesWithSchedule: Activity[] = [];
-          for (let i = 0; i < schedule!.schedule!.activities.length; i++) {
-            const activity = schedule!.schedule!.activities[i];
+          for (const activity of schedule!.schedule!.activities) {
             activity.parentSchedule = schedule?.schedule;
             activitiesWithSchedule.push(activity);
           }
@@ -81,7 +80,6 @@ export class AppComponent {
 
   private handleDevTesting(): void {
     if (!this._isDevTesting) {
-      this.localStorageService.setDevModeEnabledState(false);
       this.localStorageService.setNewDevModeEmulatedDateTime(undefined);
       return;
     }

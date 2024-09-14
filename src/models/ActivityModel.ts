@@ -3,7 +3,7 @@ import { ScheduleModel } from './Schedules/ScheduleModel';
 
 export class Activity {
   private readonly _minuteAllowanceToLeaveClass: number = 10;
-  private _isInstructionalTime: boolean = false;
+  private _isInstructionalTime = false;
   private _canLeaveClassStart: Date | undefined = undefined;
   private _canLeaveClassEnd: Date | undefined = undefined;
 
@@ -42,7 +42,7 @@ export class Activity {
     startHour: number,
     startMinute: number,
     durationMinutes: number,
-    warnWhenMinutesRemain: number = 0
+    warnWhenMinutesRemain = 0
   ) {
     this.type = typeEnum;
     this.startHour = startHour;

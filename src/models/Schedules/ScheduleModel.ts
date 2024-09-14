@@ -7,7 +7,7 @@ export abstract class ScheduleModel {
     new Activity(ActivityTypeEnum.MorningPrep, 7, 0, 30, 7),
   ];
   private _activities: Activity[] = [];
-  private _scheduleHasLunch: boolean = true;
+  private _scheduleHasLunch = true;
   private _blackoutTimes: IBlackoutTimes | undefined = undefined;
   public readonly type: ScheduleTypeEnum;
 

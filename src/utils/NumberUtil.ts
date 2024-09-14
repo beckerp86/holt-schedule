@@ -28,7 +28,7 @@ export abstract class NumberUtil {
     return Math.floor(Math.random() * (max - min + 1) + min);
   }
 
-  public static isNumber(num: any): boolean {
+  public static isNumber(num: unknown): boolean {
     if (typeof num === 'number') {
       return num - num === 0;
     }

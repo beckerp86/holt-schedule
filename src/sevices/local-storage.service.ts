@@ -5,8 +5,8 @@ import { inject, Injectable } from '@angular/core';
   providedIn: 'root',
 })
 export class LocalStorageService {
-  constructor() {}
   private readonly localStorage = inject(DOCUMENT)?.defaultView?.localStorage;
+
   get isDevModeEnabled(): boolean {
     return this.get<boolean>(LocalStorageKey.IsDevMode) ?? false;
   }
@@ -46,15 +46,12 @@ export class LocalStorageService {
     this.localStorage?.setItem(key.toString(), JSON.stringify(value));
   }
 
-  private remove(key: LocalStorageKey): void {
-    this.localStorage?.removeItem(key.toString());
-  }
-
   private isJSONValid(value: string): boolean {
     try {
       JSON.parse(value);
       return true;
     } catch (error) {
+      console.error(error);
       return false;
     }
   }

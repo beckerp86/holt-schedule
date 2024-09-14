@@ -81,7 +81,7 @@ export class ScheduleService {
   }
 
   private setNextSchedule(): void {
-    let date = new Date();
+    const date = new Date();
     for (let i = 0; i < 30; i++) {
       date.setDate(date.getDate() + 1);
       const scheduleType = this.getScheduleTypeForDate(date);
