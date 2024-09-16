@@ -19,6 +19,10 @@ export class LocalStorageService {
     return this.get<boolean>(LocalStorageKey.IsAudioEnabled) ?? false;
   }
 
+  get preferredChimeVariant(): string {
+    return this.get<string>(LocalStorageKey.PreferredChimeVariant) ?? '';
+  }
+
   setAudioEnabledState(newvalue: boolean): void {
     this.set(LocalStorageKey.IsAudioEnabled, newvalue);
   }
@@ -30,6 +34,10 @@ export class LocalStorageService {
   setNewDevModeEmulatedDateTime(date: Date | undefined): void {
     const newValue = !date ? '' : date.toISOString();
     this.set(LocalStorageKey.DevModeEmulatedDateTime, newValue);
+  }
+
+  setPreferredChimeVariant(chimeVariant = ''): void {
+    this.set(LocalStorageKey.PreferredChimeVariant, chimeVariant.trim());
   }
 
   private get<T>(key: LocalStorageKey): T | null {
@@ -61,4 +69,5 @@ export enum LocalStorageKey {
   IsDevMode = 'IsDevMode',
   DevModeEmulatedDateTime = 'DevModeEmulatedDateTime',
   IsAudioEnabled = 'IsAudioEnabled',
+  PreferredChimeVariant = 'PreferredChimeVariant',
 }

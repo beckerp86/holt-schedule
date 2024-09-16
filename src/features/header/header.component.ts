@@ -1,5 +1,5 @@
 import { AudioService } from '../../sevices/audio.service';
-import { CommonModule } from '@angular/common';
+import { AsyncPipe, NgIf } from '@angular/common';
 import { Component, inject } from '@angular/core';
 import { LocalStorageService } from '../../sevices/local-storage.service';
 import { ScheduleService } from '../../sevices/schedule.service';
@@ -8,7 +8,7 @@ import { TimeService } from '../../sevices/time.service';
 @Component({
   selector: 'app-header',
   standalone: true,
-  imports: [CommonModule],
+  imports: [NgIf, AsyncPipe],
   templateUrl: './header.component.html',
   styleUrl: './header.component.css',
 })
@@ -23,11 +23,6 @@ export class HeaderComponent {
     if (!this.localStorageService.isDevModeEnabled) {
       return;
     }
-
-    if (Math.random() < 0.5) {
-      this.audioService.howlChime();
-      return;
-    }
-    this.audioService.howlSeatbelt();
+    this.audioService.playWarningSound();
   }
 }

@@ -10,17 +10,14 @@ import { inject } from '@angular/core';
 export class AudioService {
   private environmentService = inject(EnvironmentService);
   private localStorageService = inject(LocalStorageService);
+  private readonly audioFileExtension = 'mp3';
 
-  public howlSeatbelt(): void {
-    this.howl(this.getFilepath(AudioFileEnum.Seatbelt, AudioFileFormat.Mp3));
-  }
-
-  public howlChime(): void {
-    this.howl(this.getFilepath(AudioFileEnum.Chime, AudioFileFormat.Wav));
+  public playWarningSound(): void {
+    if (!this.localStorageService.isAudioEnabled) return;
+    this.howl(this.getFilepath());
   }
 
   private howl(src: string): void {
-    if (!this.localStorageService.isAudioEnabled) return;
     try {
       const sound = new Howl({ src });
       sound.play();
@@ -29,23 +26,11 @@ export class AudioService {
     }
   }
 
-  private getFilepath(
-    audioFileEnum: AudioFileEnum,
-    audioFileFormat: AudioFileFormat
-  ): string {
-    return `${
-      this.environmentService.assetsPath
-    }/${audioFileEnum.toString()}.${audioFileFormat.toString()}`;
+  private getFilepath(): string {
+    const variant = this.localStorageService.preferredChimeVariant;
+    const fileName = variant.length > 0 ? `chime-${variant}` : 'chime';
+    const fileNameWithExt = `${fileName}.${this.audioFileExtension}`;
+
+    return `${this.environmentService.assetsPath}/${fileNameWithExt}`;
   }
-}
-
-export enum AudioFileEnum {
-  Chime = 'chime',
-  Seatbelt = 'seatbelt',
-}
-
-export enum AudioFileFormat {
-  Wav = 'wav',
-  Mp3 = 'mp3',
-  Ogg = 'ogg',
 }

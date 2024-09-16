@@ -100,18 +100,14 @@ export class ActivityComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.ngUnsubscribe$.next(null);
-    this.ngUnsubscribe$.complete();
+    this.completeSub();
   }
 
   private async updatePercentComplete(nowMs: number): Promise<void> {
-    if (
-      !NumberUtil.IsPositiveInteger(this._startMs) ||
-      !NumberUtil.IsPositiveInteger(this._endMs) ||
-      !NumberUtil.IsPositiveInteger(nowMs)
-    ) {
+    if (this._startMs === 0 || this._endMs === 0 || nowMs === 0) {
       return;
     }
+
     let percentComplete =
       (nowMs - this._startMs) / (this._endMs - this._startMs);
     percentComplete = percentComplete > 1 ? 1 : percentComplete; // cap percent complete at 100%
@@ -138,9 +134,8 @@ export class ActivityComponent implements OnInit, AfterViewInit, OnDestroy {
     // Sets pseudo element's width inline
     this._containerElement?.style.setProperty('--before-width', `${widthPx}px`);
     if (this.isComplete) {
-      this.ngUnsubscribe$.next(null);
-      this.ngUnsubscribe$.complete();
       this._containerElement?.classList.add('falling');
+      this.completeSub();
     }
   }
 
@@ -166,7 +161,7 @@ export class ActivityComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private soundTheAlarm(): void {
-    this.audioService.howlChime();
+    this.audioService.playWarningSound();
   }
 
   private async updateCanLeaveClass(nowMs: number): Promise<void> {
@@ -224,5 +219,10 @@ export class ActivityComponent implements OnInit, AfterViewInit, OnDestroy {
         );
         this.progressBarCurrentPixelWidthSubject.next(nextWidth);
       });
+  }
+
+  private completeSub(): void {
+    this.ngUnsubscribe$.next(null);
+    this.ngUnsubscribe$.complete();
   }
 }
