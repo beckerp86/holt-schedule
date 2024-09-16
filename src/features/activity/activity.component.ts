@@ -105,6 +105,13 @@ export class ActivityComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private async updatePercentComplete(nowMs: number): Promise<void> {
+    if (
+      !NumberUtil.IsPositiveInteger(this._startMs) ||
+      !NumberUtil.IsPositiveInteger(this._endMs) ||
+      !NumberUtil.IsPositiveInteger(nowMs)
+    ) {
+      return;
+    }
     let percentComplete =
       (nowMs - this._startMs) / (this._endMs - this._startMs);
     percentComplete = percentComplete > 1 ? 1 : percentComplete; // cap percent complete at 100%
@@ -160,7 +167,6 @@ export class ActivityComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private soundTheAlarm(): void {
     this.audioService.howlChime();
-    // this.audioService.howlSeatbelt();
   }
 
   private async updateCanLeaveClass(nowMs: number): Promise<void> {
@@ -207,10 +213,8 @@ export class ActivityComponent implements OnInit, AfterViewInit, OnDestroy {
       .pipe(debounceTime(100), takeUntil(this.ngUnsubscribe$))
       .subscribe(([percentComplete, progressBarContainerPixelWidth]) => {
         if (
-          Number.isNaN(percentComplete) ||
-          !Number.isFinite(percentComplete) ||
-          Number.isNaN(progressBarContainerPixelWidth) ||
-          !Number.isFinite(progressBarContainerPixelWidth)
+          !NumberUtil.isNumber(percentComplete) ||
+          !NumberUtil.isNumber(progressBarContainerPixelWidth)
         ) {
           return;
         }

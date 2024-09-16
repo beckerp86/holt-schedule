@@ -1,8 +1,8 @@
 import { Activity } from '../../models/ActivityModel';
 import { ActivityComponent } from '../activity/activity.component';
 import { ArrayUtil } from '../../utils/ArrayUtil';
+import { AsyncPipe, NgFor } from '@angular/common';
 import { BehaviorSubject, distinctUntilChanged } from 'rxjs';
-import { CommonModule } from '@angular/common';
 import { Component, inject } from '@angular/core';
 import { DailySchedule } from '../../models/DailySchedule';
 import { FooterComponent } from '../footer/footer.component';
@@ -17,7 +17,8 @@ import { TimeService } from '../../sevices/time.service';
   standalone: true,
   imports: [
     RouterOutlet,
-    CommonModule,
+    NgFor,
+    AsyncPipe,
     ActivityComponent,
     HeaderComponent,
     FooterComponent,
