@@ -1,24 +1,23 @@
 import { BehaviorSubject } from 'rxjs';
 import { DailySchedule } from '../models/DailySchedule';
+import { LocalStorageService } from './local-storage.service';
 import { ScheduleTypeEnum } from '../models/ScheduleTypeEnum';
 import { TimeService } from './time.service';
 import { inject, Injectable } from '@angular/core';
-import {
-  noSchoolOverrides,
-  halfDayOverrides,
-  pepRallyOverrides,
-  earlyReleaseWednesdayOverrides,
-} from '../models/data/ScheduleOverrides';
+import { scheduleOverrides } from '../models/data/ScheduleOverrides';
+import { TimeUtil } from '../utils/TimeUtil';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ScheduleService {
+  private timeService = inject(TimeService);
+  private localStorageService = inject(LocalStorageService);
+
   constructor() {
     this.initSubscriptions();
+    this.printNext30DaysToConsole();
   }
-
-  private timeService = inject(TimeService);
 
   private _todaysScheduleSubject = new BehaviorSubject<
     DailySchedule | undefined
@@ -30,13 +29,6 @@ export class ScheduleService {
   );
   public nextSchedule$ = this._nextScheduleSubject.asObservable();
 
-  private readonly _overrides: IScheduleOverride[] = [
-    ...noSchoolOverrides,
-    ...halfDayOverrides,
-    ...pepRallyOverrides,
-    ...earlyReleaseWednesdayOverrides,
-  ];
-
   private getScheduleTypeForDate(date: Date): ScheduleTypeEnum {
     return (
       this.getOverriddenScheduleTypeForDate(date) ??
@@ -47,7 +39,7 @@ export class ScheduleService {
   private getOverriddenScheduleTypeForDate(
     date: Date
   ): ScheduleTypeEnum | undefined {
-    return this._overrides.find(
+    return scheduleOverrides.find(
       x =>
         x.date.getDate() === date.getDate() &&
         x.date.getMonth() === date.getMonth() &&
@@ -99,6 +91,17 @@ export class ScheduleService {
       this.setTodaysSchedule();
       this.setNextSchedule();
     });
+  }
+
+  private printNext30DaysToConsole(): void {
+    if (!this.localStorageService.isDevModeEnabled) return;
+    for (let i = 0; i < 30; i++) {
+      let date = new Date();
+      date = TimeUtil.addMinutes(date, i * 60 * 24);
+      const scheduleType: ScheduleTypeEnum = this.getScheduleTypeForDate(date);
+      const schedule = new DailySchedule(scheduleType);
+      console.log(date, schedule.scheduleDescription);
+    }
   }
 }
 

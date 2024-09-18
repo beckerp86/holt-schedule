@@ -1,7 +1,7 @@
 import { IScheduleOverride } from '../../sevices/schedule.service';
 import { ScheduleTypeEnum } from '../ScheduleTypeEnum';
 
-export const noSchoolOverrides: IScheduleOverride[] = [
+const noSchoolOverrides: IScheduleOverride[] = [
   {
     date: new Date(2024, 9, 14),
     scheduleType: ScheduleTypeEnum.NoSchool,
@@ -154,7 +154,7 @@ export const noSchoolOverrides: IScheduleOverride[] = [
   },
 ];
 
-export const halfDayOverrides: IScheduleOverride[] = [
+const halfDayOverrides: IScheduleOverride[] = [
   {
     date: new Date(2024, 8, 26),
     scheduleType: ScheduleTypeEnum.HalfDay1Through3,
@@ -207,19 +207,14 @@ export const halfDayOverrides: IScheduleOverride[] = [
   },
 ];
 
-export const pepRallyOverrides: IScheduleOverride[] = [
+const pepRallyOverrides: IScheduleOverride[] = [
   {
-    date: new Date(2024, 8, 27),
+    date: new Date(2024, 8, 23),
     scheduleType: ScheduleTypeEnum.PepRally,
   },
-  // {
-  //   // TODO: Get Pep Rally dates from Heather
-  //   date: new Date(2024, 8, 27),
-  //   scheduleType: ScheduleTypeEnum.PepRally,
-  // },
 ];
 
-export const earlyReleaseWednesdayOverrides: IScheduleOverride[] = [
+const earlyReleaseWednesdayOverrides: IScheduleOverride[] = [
   {
     date: new Date(2024, 8, 11),
     scheduleType: ScheduleTypeEnum.EarlyRelease,
@@ -292,4 +287,11 @@ export const earlyReleaseWednesdayOverrides: IScheduleOverride[] = [
     date: new Date(2025, 4, 28),
     scheduleType: ScheduleTypeEnum.EarlyRelease,
   },
+];
+
+export const scheduleOverrides: IScheduleOverride[] = [
+  ...noSchoolOverrides,
+  ...halfDayOverrides,
+  ...pepRallyOverrides,
+  ...earlyReleaseWednesdayOverrides,
 ];
