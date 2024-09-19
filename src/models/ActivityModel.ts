@@ -1,5 +1,4 @@
 import { TimeUtil } from '../utils/TimeUtil';
-import { ScheduleModel } from './Schedules/ScheduleModel';
 
 export class Activity {
   private readonly _minuteAllowanceToLeaveClass: number = 10;
@@ -12,10 +11,16 @@ export class Activity {
   readonly startMinute: number;
   readonly durationMinutes: number;
   readonly warnWhenMinutesRemain: number;
-  readonly startDate: Date;
-  readonly endDate: Date;
+  private _startDate: Date = new Date();
+  private _endDate: Date = new Date();
 
-  public parentSchedule?: ScheduleModel;
+  get startDate(): Date {
+    return this._startDate;
+  }
+
+  get endDate(): Date {
+    return this._endDate;
+  }
 
   get isInstructionalTime(): boolean {
     return this._isInstructionalTime;
@@ -50,19 +55,7 @@ export class Activity {
     this.durationMinutes = durationMinutes;
     this.warnWhenMinutesRemain = warnWhenMinutesRemain;
 
-    const startDate = new Date();
-    this.startDate = new Date(
-      startDate.getFullYear(),
-      startDate.getMonth(),
-      startDate.getDate(),
-      startHour,
-      startMinute,
-      0,
-      0
-    );
-    this.endDate = TimeUtil.addMinutes(this.startDate, durationMinutes);
-    this.setInstructionalTime();
-    this.setAllowedRangeToLeaveClass();
+    this.calculateAndSetDates();
   }
 
   get typeDescription(): string {
@@ -108,6 +101,26 @@ export class Activity {
     }
   }
 
+  public recalculateDatesForRefDate(refDate: Date): void {
+    this.calculateAndSetDates(refDate);
+  }
+
+  private calculateAndSetDates(refDate: Date = new Date()): void {
+    this._startDate = new Date(
+      refDate.getFullYear(),
+      refDate.getMonth(),
+      refDate.getDate(),
+      this.startHour,
+      this.startMinute,
+      0,
+      0
+    );
+    this._endDate = TimeUtil.addMinutes(this.startDate, this.durationMinutes);
+
+    this.setInstructionalTime();
+    this.setAllowedRangeToLeaveClass();
+  }
+
   private setAllowedRangeToLeaveClass(): void {
     if (!this.isInstructionalTime) {
       return;
@@ -126,29 +139,13 @@ export class Activity {
   private setInstructionalTime(): void {
     switch (this.type) {
       case ActivityTypeEnum.FirstHour:
-        this._isInstructionalTime = true;
-        break;
       case ActivityTypeEnum.SecondHour:
-        this._isInstructionalTime = true;
-        break;
       case ActivityTypeEnum.ThirdHour:
-        this._isInstructionalTime = true;
-        break;
       case ActivityTypeEnum.FourthHour:
-        this._isInstructionalTime = true;
-        break;
       case ActivityTypeEnum.FifthHour:
-        this._isInstructionalTime = true;
-        break;
       case ActivityTypeEnum.SixthHour:
-        this._isInstructionalTime = true;
-        break;
       case ActivityTypeEnum.ALunchClass:
-        this._isInstructionalTime = true;
-        break;
       case ActivityTypeEnum.BLunchClass:
-        this._isInstructionalTime = true;
-        break;
       case ActivityTypeEnum.RamTime:
         this._isInstructionalTime = true;
         break;

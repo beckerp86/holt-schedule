@@ -1,6 +1,7 @@
-import { AudioService } from '../../sevices/audio.service';
 import { AsyncPipe, NgIf } from '@angular/common';
+import { AudioService } from '../../sevices/audio.service';
 import { Component, inject } from '@angular/core';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { LocalStorageService } from '../../sevices/local-storage.service';
 import { ScheduleService } from '../../sevices/schedule.service';
 import { TimeService } from '../../sevices/time.service';
@@ -8,7 +9,7 @@ import { TimeService } from '../../sevices/time.service';
 @Component({
   selector: 'app-header',
   standalone: true,
-  imports: [NgIf, AsyncPipe],
+  imports: [NgIf, AsyncPipe, FontAwesomeModule],
   templateUrl: './header.component.html',
   styleUrl: './header.component.css',
 })

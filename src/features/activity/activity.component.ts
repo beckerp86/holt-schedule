@@ -1,13 +1,12 @@
-import { Activity } from '../../models/ActivityModel';
+import { Activity, ActivityTypeEnum } from '../../models/ActivityModel';
 import {
   AfterViewInit,
   Component,
-  ElementRef,
   inject,
   Input,
   OnDestroy,
   OnInit,
-  ViewChild,
+  signal,
 } from '@angular/core';
 import { AsyncPipe, NgClass, NgIf } from '@angular/common';
 import { AudioService } from '../../sevices/audio.service';
@@ -18,35 +17,36 @@ import {
   Subject,
   takeUntil,
 } from 'rxjs';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { NumberUtil } from '../../utils/NumberUtil';
 import { ResizeObservableService } from '../../sevices/resize-observable.service';
 import { ScheduleService } from '../../sevices/schedule.service';
 import { TimeService } from '../../sevices/time.service';
 import { TimeUtil } from '../../utils/TimeUtil';
+import { ScheduleTypeEnum } from '../../models/ScheduleTypeEnum';
 
 @Component({
   selector: 'app-activity',
   standalone: true,
-  imports: [AsyncPipe, NgIf, NgClass],
+  imports: [AsyncPipe, NgIf, NgClass, FontAwesomeModule],
   templateUrl: './activity.component.html',
   styleUrl: './activity.component.css',
 })
 export class ActivityComponent implements OnInit, AfterViewInit, OnDestroy {
   @Input() public activity?: Activity;
 
-  @ViewChild('timerIcon', { static: false }) public timerIcon!: ElementRef;
-
   public timeService = inject(TimeService);
   public scheduleService = inject(ScheduleService);
   private resizeService = inject(ResizeObservableService);
   private audioService = inject(AudioService);
 
+  public animateBullhorn = false;
   public htmlId = crypto.randomUUID();
   private _containerElement: HTMLElement | null = null;
 
   private ngUnsubscribe$ = new Subject();
   private isComplete = false;
-  private playedWarningChime = false;
+  public playedWarningChime = false;
 
   private _startMs = 0;
   private _endMs = 0;
@@ -67,8 +67,10 @@ export class ActivityComponent implements OnInit, AfterViewInit, OnDestroy {
   public progressBarContainerPixelWidth$ =
     this.progressBarContainerPixelWidthSubject.asObservable();
 
-  private canLeaveClassSubject = new BehaviorSubject<boolean>(false);
-  public canLeaveClass$ = this.canLeaveClassSubject.asObservable();
+  public canLeaveClass$ = signal(false);
+  public isAnnouncementRequired$ = signal(false);
+  public announcementWarningTime$ = signal<Date | undefined>(undefined);
+  public shouldAnimateBullhorn$ = signal(false);
 
   constructor() {
     this.initSubscriptions();
@@ -77,6 +79,7 @@ export class ActivityComponent implements OnInit, AfterViewInit, OnDestroy {
   ngOnInit(): void {
     this._startMs = this.activity?.startDate?.getTime() ?? 0;
     this._endMs = this.activity?.endDate?.getTime() ?? 0;
+    this.setAnnouncementTime();
   }
 
   ngAfterViewInit(): void {
@@ -126,19 +129,6 @@ export class ActivityComponent implements OnInit, AfterViewInit, OnDestroy {
     this.countdownDisplaySubject.next(TimeUtil.getTimerDisplay(duration));
   }
 
-  private updateProgressBarWidth(widthPx: number): void {
-    if (!this.activity) {
-      return;
-    }
-
-    // Sets pseudo element's width inline
-    this._containerElement?.style.setProperty('--before-width', `${widthPx}px`);
-    if (this.isComplete) {
-      this._containerElement?.classList.add('falling');
-      this.completeSub();
-    }
-  }
-
   private async playWarningChime(nowMs: number): Promise<void> {
     if (
       !this.activity ||
@@ -150,14 +140,9 @@ export class ActivityComponent implements OnInit, AfterViewInit, OnDestroy {
     const chimeMs =
       this._endMs - this.activity.warnWhenMinutesRemain * 60 * 1000;
     if (nowMs >= chimeMs) {
-      this.makeTimerJump();
       this.playedWarningChime = true;
       this.soundTheAlarm();
     }
-  }
-
-  private makeTimerJump(): void {
-    this.timerIcon.nativeElement.classList.add('jump-shake');
   }
 
   private soundTheAlarm(): void {
@@ -169,8 +154,7 @@ export class ActivityComponent implements OnInit, AfterViewInit, OnDestroy {
       this.activity === undefined ||
       this.activity.isInstructionalTime !== true ||
       this.activity.canLeaveClassStart === undefined ||
-      this.activity.canLeaveClassEnd === undefined ||
-      this.activity.parentSchedule === undefined
+      this.activity.canLeaveClassEnd === undefined
     ) {
       return;
     }
@@ -181,12 +165,22 @@ export class ActivityComponent implements OnInit, AfterViewInit, OnDestroy {
       this.activity.canLeaveClassEnd!.getTime()
     );
     if (!allowedByTenMinuteRule) {
-      this.canLeaveClassSubject.next(allowedByTenMinuteRule);
+      this.canLeaveClass$.set(allowedByTenMinuteRule);
       return;
     }
-    const allowedByLunchRule =
-      !this.activity.parentSchedule?.isInBlackoutTime(nowMs);
-    this.canLeaveClassSubject.next(allowedByLunchRule);
+    const allowedByLunchRule = !this.scheduleService.areLunchesActive$();
+    this.canLeaveClass$.set(allowedByLunchRule);
+  }
+
+  private async updateAnnouncementTime(nowMs: number): Promise<void> {
+    if (
+      this.isAnnouncementRequired$() === true &&
+      this.announcementWarningTime$() !== undefined
+    ) {
+      this.shouldAnimateBullhorn$.set(
+        nowMs >= this.announcementWarningTime$()!.getTime()
+      );
+    }
   }
 
   private async initSubscriptions(): Promise<void> {
@@ -200,6 +194,7 @@ export class ActivityComponent implements OnInit, AfterViewInit, OnDestroy {
           this.updateCountdownDisplay(now),
           this.playWarningChime(nowMs),
           this.updateCanLeaveClass(nowMs),
+          this.updateAnnouncementTime(nowMs),
         ]);
       });
 
@@ -224,5 +219,73 @@ export class ActivityComponent implements OnInit, AfterViewInit, OnDestroy {
   private completeSub(): void {
     this.ngUnsubscribe$.next(null);
     this.ngUnsubscribe$.complete();
+  }
+
+  private setAnnouncementTime(): void {
+    const parentScheduleType =
+      this.scheduleService.todaysSchedule$()?.schedule?.type;
+    if (parentScheduleType === undefined) {
+      throw Error('Schedule Type could not be resolved.');
+    }
+
+    if (this.activity?.type === undefined) {
+      throw Error('Activity Type could not be resolved.');
+    }
+
+    const secondHourSchedules: ScheduleTypeEnum[] = [
+      ScheduleTypeEnum.Standard,
+      ScheduleTypeEnum.EarlyRelease,
+      ScheduleTypeEnum.PepRally,
+      ScheduleTypeEnum.HalfDay1Through3,
+    ];
+    if (
+      secondHourSchedules.includes(parentScheduleType) &&
+      this.activity.type === ActivityTypeEnum.SecondHour
+    ) {
+      this.enableAnnouncementTime();
+      return;
+    }
+
+    const fifthHourSchedules: ScheduleTypeEnum[] = [
+      ScheduleTypeEnum.HalfDay4Through6,
+    ];
+    if (
+      fifthHourSchedules.includes(parentScheduleType) &&
+      this.activity.type === ActivityTypeEnum.FifthHour
+    ) {
+      this.enableAnnouncementTime();
+      return;
+    }
+
+    const sixthHourSchedules: ScheduleTypeEnum[] = [ScheduleTypeEnum.RamTime];
+    if (
+      sixthHourSchedules.includes(parentScheduleType) &&
+      this.activity.type === ActivityTypeEnum.SixthHour
+    ) {
+      this.enableAnnouncementTime();
+    }
+  }
+
+  private enableAnnouncementTime(): void {
+    this.isAnnouncementRequired$.set(true);
+    if (this.activity?.endDate === undefined) {
+      throw Error('End Date could not be resolved for Activity.');
+    }
+    this.announcementWarningTime$.set(
+      TimeUtil.addMinutes(this.activity?.endDate, -10)
+    );
+  }
+
+  private updateProgressBarWidth(widthPx: number): void {
+    if (!this.activity) {
+      return;
+    }
+
+    // Sets pseudo element's width inline
+    this._containerElement?.style.setProperty('--before-width', `${widthPx}px`);
+    if (this.isComplete) {
+      this._containerElement?.classList.add('falling');
+      this.completeSub();
+    }
   }
 }

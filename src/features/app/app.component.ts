@@ -4,13 +4,19 @@ import { ArrayUtil } from '../../utils/ArrayUtil';
 import { AsyncPipe, NgFor } from '@angular/common';
 import { BehaviorSubject, distinctUntilChanged } from 'rxjs';
 import { Component, inject } from '@angular/core';
-import { DailySchedule } from '../../models/DailySchedule';
 import { FooterComponent } from '../footer/footer.component';
 import { HeaderComponent } from '../header/header.component';
 import { LocalStorageService } from '../../sevices/local-storage.service';
 import { RouterOutlet } from '@angular/router';
 import { ScheduleService } from '../../sevices/schedule.service';
 import { TimeService } from '../../sevices/time.service';
+import {
+  FontAwesomeModule,
+  FaIconLibrary,
+  FaConfig,
+} from '@fortawesome/angular-fontawesome';
+import { faBullhorn } from '@fortawesome/free-solid-svg-icons';
+import { faBell, faBellSlash } from '@fortawesome/free-regular-svg-icons';
 
 @Component({
   selector: 'app-root',
@@ -22,6 +28,7 @@ import { TimeService } from '../../sevices/time.service';
     ActivityComponent,
     HeaderComponent,
     FooterComponent,
+    FontAwesomeModule,
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css',
@@ -41,7 +48,8 @@ export class AppComponent {
     .asObservable()
     .pipe(distinctUntilChanged());
 
-  constructor() {
+  constructor(faLibrary: FaIconLibrary, faConfig: FaConfig) {
+    this.configureFontAwesomeLibrary(faLibrary, faConfig);
     this.handleDevTesting();
 
     // Every second, check to make sure only the active activities are displayed
@@ -52,21 +60,27 @@ export class AppComponent {
     });
 
     // When date changes, fetch new day's schedule
-    this.scheduleService.todaysSchedule$.subscribe(
-      (schedule: DailySchedule | undefined) => {
-        // add parent schedule to each activity
-        if (ArrayUtil.IsArrayAndHasItems(schedule?.schedule?.activities)) {
-          const activitiesWithSchedule: Activity[] = [];
-          for (const activity of schedule!.schedule!.activities) {
-            activity.parentSchedule = schedule?.schedule;
-            activitiesWithSchedule.push(activity);
-          }
-          this.activities = activitiesWithSchedule;
-          return;
-        }
-        this.activities = [];
+    this.timeService.dateChange$.subscribe(() => {
+      // add parent schedule to each activity
+      const schedule = this.scheduleService.todaysSchedule$()?.schedule;
+      if (schedule === undefined) {
+        return; // no school today
       }
-    );
+      if (ArrayUtil.IsArrayAndHasItems(schedule.activities)) {
+        const activitiesWithSchedule: Activity[] = [];
+        for (const activity of schedule.activities) {
+          if (this.localStorageService.isDevTestingWithCustomDate) {
+            activity.recalculateDatesForRefDate(
+              this.localStorageService.devModeEmulatedDateTime as Date
+            );
+          }
+          activitiesWithSchedule.push(activity);
+        }
+        this.activities = activitiesWithSchedule;
+        return;
+      }
+      this.activities = [];
+    });
   }
 
   private updateCurrentActivities(now: Date): void {
@@ -86,8 +100,16 @@ export class AppComponent {
     }
 
     // Set the date here where we want to start testing from.
-    const now = new Date(2024, 8, 12, 12, 28, 50);
+    const customDate = new Date(2024, 9, 5, 9, 44, 50);
     this.localStorageService.setDevModeEnabledState(true);
-    this.localStorageService.setNewDevModeEmulatedDateTime(now);
+    this.localStorageService.setNewDevModeEmulatedDateTime(customDate);
+  }
+
+  private configureFontAwesomeLibrary(
+    faLibrary: FaIconLibrary,
+    faConfig: FaConfig
+  ): void {
+    faLibrary.addIcons(faBullhorn, faBellSlash, faBell);
+    faConfig.fixedWidth = true;
   }
 }

@@ -9,6 +9,7 @@ import { inject, Injectable } from '@angular/core';
 })
 export class TimeService {
   private localStorageService = inject(LocalStorageService);
+  private _inDevModeWithCustomDate = false;
 
   private _currentTimeDisplaySubject = new BehaviorSubject<string>('');
   public currentTimeDisplay$ = this._currentTimeDisplaySubject.asObservable();
@@ -16,46 +17,43 @@ export class TimeService {
   private _currentDateDisplaySubject = new BehaviorSubject<string>('');
   public currentDateDisplay$ = this._currentDateDisplaySubject.asObservable();
 
-  private _currentDateSubject = new BehaviorSubject<Date>(new Date());
-  public currentDateTime$ = this._currentDateSubject.asObservable();
+  private _currentDateTimeSubject = new BehaviorSubject<Date>(new Date());
+  public currentDateTime$ = this._currentDateTimeSubject.asObservable();
 
   private _dateChangeSubject = new BehaviorSubject<Date>(new Date());
   public dateChange$ = this._dateChangeSubject.asObservable();
 
   constructor() {
-    const constructionDate = new Date();
-    this._currentDateSubject.next(constructionDate);
-    this.setNewTimeDisplay(constructionDate);
-    this.setNewDateDisplay(constructionDate);
+    this._inDevModeWithCustomDate =
+      this.localStorageService.isDevModeEnabled &&
+      this.localStorageService.devModeEmulatedDateTime !== null;
+    const date = this._inDevModeWithCustomDate
+      ? (this.localStorageService.devModeEmulatedDateTime as Date)
+      : new Date();
+    this._currentDateTimeSubject.next(date);
+    this.setNewTimeDisplay(date);
+    this.setNewDateDisplay(date);
 
     // Every second, update the Date observable
-    if (
-      this.localStorageService.isDevModeEnabled &&
-      !!this.localStorageService.devModeEmulatedDateTime
-    ) {
+    if (this._inDevModeWithCustomDate) {
       // We are in dev mode, and we want to start adding seconds to the DevMode emulated date.
       of(null)
         .pipe(repeat({ delay: 1000 }))
         .subscribe(() => {
-          const localStorageDate =
-            this.localStorageService.devModeEmulatedDateTime;
-          if (!localStorageDate) {
-            throw new Error(
-              'LocalStorageService.devModeEmulatedDateTime is null'
-            );
-          }
+          const localStorageDate = this.localStorageService
+            .devModeEmulatedDateTime as Date;
           localStorageDate?.setTime(localStorageDate.getTime() + 1000);
           this.localStorageService.setNewDevModeEmulatedDateTime(
             localStorageDate
           );
-          this._currentDateSubject.next(localStorageDate);
+          this._currentDateTimeSubject.next(localStorageDate);
         });
     } else {
       // default resolution of current DateTime
       of(null)
         .pipe(repeat({ delay: 1000 }))
         .subscribe(() => {
-          this._currentDateSubject.next(new Date());
+          this._currentDateTimeSubject.next(new Date());
         });
     }
 

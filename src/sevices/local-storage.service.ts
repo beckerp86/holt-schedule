@@ -12,7 +12,14 @@ export class LocalStorageService {
   }
 
   get devModeEmulatedDateTime(): Date | null {
-    return this.get<Date>(LocalStorageKey.DevModeEmulatedDateTime);
+    const localStorageValue: string | null = this.get<string>(
+      LocalStorageKey.DevModeEmulatedDateTime
+    );
+    return !localStorageValue ? null : new Date(localStorageValue);
+  }
+
+  get isDevTestingWithCustomDate(): boolean {
+    return this.isDevModeEnabled && this.devModeEmulatedDateTime !== null;
   }
 
   get isAudioEnabled(): boolean {

@@ -1,11 +1,10 @@
-import { BehaviorSubject } from 'rxjs';
 import { DailySchedule } from '../models/DailySchedule';
 import { LocalStorageService } from './local-storage.service';
 import { ScheduleTypeEnum } from '../models/ScheduleTypeEnum';
 import { TimeService } from './time.service';
-import { inject, Injectable } from '@angular/core';
-import { scheduleOverrides } from '../models/data/ScheduleOverrides';
 import { TimeUtil } from '../utils/TimeUtil';
+import { inject, Injectable, signal } from '@angular/core';
+import { scheduleOverrides } from '../models/data/ScheduleOverrides';
 
 @Injectable({
   providedIn: 'root',
@@ -18,16 +17,9 @@ export class ScheduleService {
     this.initSubscriptions();
     this.printNext30DaysToConsole();
   }
-
-  private _todaysScheduleSubject = new BehaviorSubject<
-    DailySchedule | undefined
-  >(undefined);
-  public todaysSchedule$ = this._todaysScheduleSubject.asObservable();
-
-  private _nextScheduleSubject = new BehaviorSubject<INextSchedule | null>(
-    null
-  );
-  public nextSchedule$ = this._nextScheduleSubject.asObservable();
+  public todaysSchedule$ = signal<DailySchedule | undefined>(undefined);
+  public nextSchedule$ = signal<INextSchedule | null>(null);
+  public areLunchesActive$ = signal(false);
 
   private getScheduleTypeForDate(date: Date): ScheduleTypeEnum {
     return (
@@ -66,10 +58,13 @@ export class ScheduleService {
   }
 
   private setTodaysSchedule(): void {
+    const scheduleDate = this.localStorageService.isDevTestingWithCustomDate
+      ? (this.localStorageService.devModeEmulatedDateTime as Date)
+      : new Date();
     const todaysSchedule = new DailySchedule(
-      this.getScheduleTypeForDate(new Date())
+      this.getScheduleTypeForDate(scheduleDate)
     );
-    this._todaysScheduleSubject.next(todaysSchedule);
+    this.todaysSchedule$.set(todaysSchedule);
   }
 
   private setNextSchedule(): void {
@@ -79,11 +74,11 @@ export class ScheduleService {
       const scheduleType = this.getScheduleTypeForDate(date);
       if (scheduleType !== ScheduleTypeEnum.NoSchool) {
         const schedule = new DailySchedule(scheduleType);
-        this._nextScheduleSubject.next({ date, schedule });
+        this.nextSchedule$.set({ date, schedule });
         return;
       }
     }
-    this._nextScheduleSubject.next(null);
+    this.nextSchedule$.set(null);
   }
 
   private initSubscriptions(): void {
@@ -91,6 +86,35 @@ export class ScheduleService {
       this.setTodaysSchedule();
       this.setNextSchedule();
     });
+
+    if (
+      this.todaysSchedule$()?.schedule?.scheduleHasLunch === true &&
+      !!this.todaysSchedule$()?.schedule?.lunchBlackoutTimes
+    ) {
+      this.timeService.currentDateTime$.subscribe((now: Date) => {
+        this.calculateAndSetLunchActive(now);
+      });
+    }
+  }
+
+  private calculateAndSetLunchActive(now: Date): void {
+    const timeMs = now.getTime();
+    this.areLunchesActive$.set(
+      TimeUtil.isTimeBetweenInclusive(
+        timeMs,
+        this.todaysSchedule$()!.schedule!.lunchBlackoutTimes!
+          .aLunchBlackoutStartMs,
+        this.todaysSchedule$()!.schedule!.lunchBlackoutTimes!
+          .aLunchBlackoutEndMs
+      ) ||
+        TimeUtil.isTimeBetweenInclusive(
+          timeMs,
+          this.todaysSchedule$()!.schedule!.lunchBlackoutTimes!
+            .bLunchBlackoutStartMs,
+          this.todaysSchedule$()!.schedule!.lunchBlackoutTimes!
+            .bLunchBlackoutEndMs
+        )
+    );
   }
 
   private printNext30DaysToConsole(): void {

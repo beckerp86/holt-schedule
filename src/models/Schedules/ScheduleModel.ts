@@ -1,4 +1,3 @@
-import { TimeUtil } from '../../utils/TimeUtil';
 import { Activity, ActivityTypeEnum } from '../ActivityModel';
 import { ScheduleTypeEnum } from '../ScheduleTypeEnum';
 
@@ -33,22 +32,6 @@ export abstract class ScheduleModel {
       (x: Activity) => x.type === ActivityTypeEnum.ALunch
     );
     this.setLunchBlackoutTime();
-  }
-
-  public isInBlackoutTime(timeMs: number): boolean {
-    if (!this.scheduleHasLunch || !this.lunchBlackoutTimes) return false;
-    return (
-      TimeUtil.isTimeBetweenInclusive(
-        timeMs,
-        this.lunchBlackoutTimes?.aLunchBlackoutStartMs,
-        this.lunchBlackoutTimes?.aLunchBlackoutEndMs
-      ) ||
-      TimeUtil.isTimeBetweenInclusive(
-        timeMs,
-        this.lunchBlackoutTimes?.bLunchBlackoutStartMs,
-        this.lunchBlackoutTimes?.bLunchBlackoutEndMs
-      )
-    );
   }
 
   private setLunchBlackoutTime(): void {
